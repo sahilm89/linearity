@@ -1,0 +1,153 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{sansmath}
+\begin{document}
+
+%For divisive normalization,
+\sffamily\sansmath
+%\begin{equation}
+%\frac{dO}{dE} = \frac{1}{input}
+%\end{equation}
+%%where $O$, $E$ are Observed and Expected features.\\
+%
+%%Assuming that the Input proportionally increases excitation,
+%\begin{equation}
+%\frac{dO}{dE} = \frac{k}{E}
+%\end{equation}
+%
+%%It follows that,
+%\begin{equation}
+%\int {dO} = k \int \frac{{dE}}{E}
+%\end{equation}
+%\begin{equation}
+%O = k \times log(E) + c
+%\end{equation}
+%%\begin{equation}
+%%\frac{dV_m}{dt} = \frac{1}{C_m }[(E_{leak} - V_m(t))g_{leak} + I_{syn}(t)]
+%%\end{equation}
+%
+%
+%\begin{equation}
+%E_N = \sum\limits_{i=1}^{N} O_{1}^{i}
+%\end{equation}
+%
+%\begin{equation}
+%E_{N}^{j} = \sum\limits_{i=1}^{N} O_{1}^{i \in j}
+%\end{equation}
+%
+%\begin{equation}
+%O_{N}^{j}
+%\end{equation}
+
+Synapse as difference of 2 exponentials:
+
+\begin{equation}
+g(t) = \bar{g}\alpha(t, t_0, \tau_d, \tau_r)
+\end{equation}
+\begin{equation}
+\alpha = \frac{ e^{-\frac{t-t_0}{\tau_{d}}} - e^{-\frac{t-t_0}{\tau_{r}}}}{( e^{-\frac{t_0-\theta}{\tau_{d}}} - e^{-\frac{t_0-\theta}{\tau_{r}}})}
+\end{equation}
+\begin{equation}
+\theta = t_0 + \frac{\tau_r \tau_d}{\tau_d - \tau_r} log(\frac{\tau_d}{\tau_r})
+\end{equation}
+where $\theta$ is  time to peak\\
+$\alpha$ is the normalization function\\
+$\tau_d$ and $\tau_r$ are decay and rise times.
+
+\begin{equation}
+g_{e}(t) = \bar{g}_{AMPA} \alpha_e (t, 0, \tau_{e_d}, \tau_{e_r})
+\end{equation}
+
+\begin{equation}
+g_{i}(t) = \bar{g}_{GABA} \alpha_i (t, \delta, \tau_{i_d}, \tau_{i_r})
+\end{equation}
+
+$\delta$ is delay between excitation and inhibition onsets\\
+
+Total conductance equation due to AMPA and GABA:
+\begin{equation}
+I_{syn}(t) = (E_{AMPA} - V_m)g_{e}(t) + (E_{GABA} - V_m)g_{i}(t)
+\end{equation}
+
+Correspoding PSP equation:
+\begin{equation}
+\frac{dV_m}{dt} = \frac{1}{C_m }[(E_{leak} - V_m(t))g_{leak} + I_{syn}(t)]
+\end{equation}
+
+At inflextion points, $ \frac{dV_m}{dt} = 0$. Therefore,
+\begin{equation}
+(E_{leak} - V_m(t^*))g_{leak} + I_{syn}(t^*) = 0
+\end{equation}
+
+%We know that there should be 2 inflexion points in the PSP from data (one higher and one lower than $V_rest$.  Maybe I can use that information to constrain.
+
+\begin{equation}
+(E_{leak} - V_m(t^*))g_{leak} + (E_{AMPA} - V_m(t^*))g_{e}(t^*) + (E_{GABA} - V_m(t^*))g_{i}(t^*) = 0
+\end{equation}
+
+Using equations (4) and (5) in (9), and renaming $V_m(t^*)$ as $V^*_m$ and $E_{AMPA}$ and $E_{AMPA}$ as $E_e$ and $E_i$ respectively and rearranging,
+
+\begin{equation}
+V^*_m = - \left[ \frac{I_{leak} + \bar{I_e}\alpha_e(t^*,0, \tau_{e_d}, \tau_{e_r}) + \bar{I_i}\alpha_i(t^*,\delta, \tau_{i_d}, \tau_{i_r})}{g_{leak} + \bar{g_e}\alpha_e(t^*,0, \tau_{e_d}, \tau_{e_r}) + \bar{g_i}\alpha_i(t^*,\delta, \tau_{i_d}, \tau_{i_r})} \right]
+\end{equation}
+
+
+%t^*-\delta}{\tau_{i_d}}} - e^{-\frac{t^*-\delta}{\tau_{i_r}}})}{g_{leak} + \bar{g_e} ( e^{-\frac{t^*}{\tau_{e_d}}} - e^{-\frac{t^*}{\tau_{e_r}}} ) - \bar{g_i}  (e^{-\frac{t^*-\delta}{\tau_{i_d}}} - e^{-\frac{t^*-\delta}{\tau_{i_r}}})} \right]
+
+%\begin{equation}
+%V^*_m = - \left[ \frac{I_{leak} + \bar{I_e} ( e^{-\frac{t^*}{\tau_{e_d}}} - e^{-\frac{t^*}{\tau_{e_r}}} ) - \bar{I_i}  (e^{-\frac{t^*-\delta}{\tau_{i_d}}} - e^{-\frac{t^*-\delta}{\tau_{i_r}}})}{g_{leak} + \bar{g_e} ( e^{-\frac{t^*}{\tau_{e_d}}} - e^{-\frac{t^*}{\tau_{e_r}}} ) - \bar{g_i}  (e^{-\frac{t^*-\delta}{\tau_{i_d}}} - e^{-\frac{t^*-\delta}{\tau_{i_r}}})} \right]
+%\end{equation}
+
+When Gabazine is put in the bath, the inhibitory component of this equation is lost.
+
+\begin{equation}
+V^*_m (e) = - \left[ \frac{I_{leak} + \bar{I_e}\alpha_e(t^*,0, \tau_{e_d}, \tau_{e_r})}{g_{leak} + \bar{g_e}\alpha_e(t^*,0, \tau_{e_d}, \tau_{e_r})} \right]
+\end{equation}
+
+%\begin{equation}
+%V^*_m (e) = - \left[ \frac{I_{leak} + \bar{I_e} ( e^{-\frac{t^*}{\tau_{e_d}}} - e^{-\frac{t^*}{\tau_{e_r}}} )}{g_{leak} + \bar{g_e} ( e^{-\frac{t^*}{\tau_{e_d}}} - e^{-\frac{t^*}{\tau_{e_r}}} ) } \right]
+%\end{equation}
+
+Now, for divisive normalization,
+\begin{equation}
+V^*_m =\frac{1}{f(e)} V^*_m (e)
+\end{equation}
+
+where $f(E)$ is linear in $E$.\\
+
+Or, $\frac{V^*_m (e)}{V^*_m} = f(e)$ \\
+
+From 7,8 and 9,
+
+\begin{equation}
+f(e) = \left[ \frac{1 + \frac{\bar{g}_i \alpha_i}{g_{leak} + \bar{g}_e \alpha_e }}{ 1 + \frac{\bar{I}_i \alpha_i}{I_{leak} + \bar{I}_e \alpha_e }}\right]
+\end{equation}
+
+%{g_{leak} + \bar{g_e} ( e^{-\frac{t^*}{\tau_{e_d}}} - e^{-\frac{t^*}{\tau_{e_r}}} ) } }{1 - \frac {\bar{I_i}  (e^{-\frac{t^*-\delta}{\tau_{i_d}}} - e^{-\frac{t^*-\delta}{\tau_{i_r}}})}{I_{leak} + \bar{I_e} ( e^{-\frac{t^*}{\tau_{e_d}}} - e^{-\frac{t^*}{\tau_{e_r}}} )}} \right]
+
+
+%\begin{equation}
+%f(e) = \left[ \frac{1 - \frac { \bar{g_i}  (e^{-\frac{t^*-\delta}{\tau_{i_d}}} - e^{-\frac{t^*-\delta}{\tau_{i_r}}})}{g_{leak} + \bar{g_e} ( e^{-\frac{t^*}{\tau_{e_d}}} - e^{-\frac{t^*}{\tau_{e_r}}} ) } }{1 - \frac {\bar{I_i}  (e^{-\frac{t^*-\delta}{\tau_{i_d}}} - e^{-\frac{t^*-\delta}{\tau_{i_r}}})}{I_{leak} + \bar{I_e} ( e^{-\frac{t^*}{\tau_{e_d}}} - e^{-\frac{t^*}{\tau_{e_r}}} )}} \right]
+%\end{equation}
+
+The above equation is of the form $\frac{1+y}{1+x}$ and must increase linearly in E,
+\begin{enumerate}
+%\item $y \leq x$
+\item It must be of the form $y = f(e)x + (f(e)-1)$
+\end{enumerate}
+
+%$$ P(t) = g_{AMPA}(t) - g_{GABA}(t) $$
+%
+%$$ P(t) = E_0 e^{-\frac{t}{\tau_e}} - I_0 e^{-\frac{t-\delta}{\tau_i}} $$
+%
+%$$ \frac{dP(t)}{dt} = \frac{E_0}{\tau_e} e^{-\frac{t}{\tau_e}} - \frac{I_0}{\tau_i} e^{-\frac{t-\delta}{\tau_i}} (1)$$
+%The inflextion point for this will be $\frac{dP(t)}{dt} = 0$, or 
+%
+%$$ I_0 e^{-\frac{t^*-\delta}{\tau_i}} = \frac{\tau_i}{\tau_e} E_0 e^{\frac{t^*}{\tau_e}} $$
+
+%\begin{equation}
+%g_{i}(t) = \bar{g}_{GABA} \alpha_i ( e^{-\frac{t-\delta}{\tau_{i_d}}} - e^{-\frac{t-\delta}{\tau_{i_r}}})
+%\end{equation}
+
+\end{document}

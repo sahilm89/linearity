@@ -1,3 +1,7 @@
+# Folders to not copy
+logs/
+temp/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

@@ -1,12 +1,12 @@
 import numpy as np
 import scipy
 import scipy.stats as ss
+from scipy.optimize import curve_fit
+import lmfit
 import itertools as it
 import pickle # Can be used to save entire objects
 from collections import OrderedDict as ordered 
-
-## Constants ##
-smootheningTime = 0.5 # In ms
+import matplotlib.pyplot as plt
 
 class Neuron:
     ''' This is Experiment class for the photostimulation experiment '''
@@ -17,11 +17,11 @@ class Neuron:
         self.features = {0:'epsp_max', 1:'epsp_area', 2:'epsp_avg', 3:'epsp_time_to_peak', 4:'epsp_area_to_peak', 5:'epsp_min', 6:'epsp_onset'} # This is always written as entityfeatured_measure
         self.flagsList = [ "AP_flag", "noise_flag", "baseline_flag", "photodiode_flag"]
 
-    def analyzeExperiment(self, type, squares, voltage, photodiode, coords, marginOfBaseLine, marginOfInterest, F_sample):
+    def analyzeExperiment(self, type, squares, voltage, photodiode, coords, marginOfBaseLine, marginOfInterest, F_sample, smootheningTime):
         if not type in self.experiment:
-            self.experiment[type] = {squares: Experiment(self, type, squares, voltage, photodiode, coords, marginOfBaseLine, marginOfInterest,F_sample )}
+            self.experiment[type] = {squares: Experiment(self, type, squares, voltage, photodiode, coords, marginOfBaseLine, marginOfInterest,F_sample, smootheningTime )}
         else:
-            self.experiment[type].update({squares: Experiment(self, type, squares, voltage, photodiode, coords, marginOfBaseLine, marginOfInterest, F_sample )})
+            self.experiment[type].update({squares: Experiment(self, type, squares, voltage, photodiode, coords, marginOfBaseLine, marginOfInterest, F_sample, smootheningTime )})
         #self.experiment[type][squares]._transformTrials()
         self.experiment[type][squares]._groupTrialsByCoords() #Creating coord based grouping
         #self.experiment[type][squares]._transformCoords()
@@ -34,7 +34,7 @@ class Neuron:
 
 class Experiment:
     ''' Change this to key: [coords, photodiode, value]''' 
-    def __init__(self, neuron, type, numSquares, voltage, photodiode, coords, marginOfBaseline, marginOfInterest, F_sample):
+    def __init__(self, neuron, type, numSquares, voltage, photodiode, coords, marginOfBaseline, marginOfInterest, F_sample, smootheningTime):
         self.neuron = neuron
         if type:
             self.type = type 
@@ -42,6 +42,8 @@ class Experiment:
             self.type = 'Control'
         self.numSquares = numSquares 
         self.F_sample = F_sample
+        self.samplingTime = 1./self.F_sample
+        self.smootheningTime = smootheningTime
         self.marginOfBaseline = marginOfBaseline
         self.marginOfInterest = marginOfInterest
         self.coords = self._returnCoordinates(coords, voltage)
@@ -140,6 +142,8 @@ class Trial:
         self.experiment = experiment 
         self.neuron = self.experiment.neuron
         self.F_sample = self.experiment.F_sample
+        self.samplingTime = self.experiment.samplingTime
+        self.smootheningTime = self.experiment.smootheningTime
         self.feature = {}
         self.linearly_transformed_feature = {} 
         self.flags = {}
@@ -148,7 +152,20 @@ class Trial:
         self.baselineWindow = voltage[self.experiment.marginOfBaseline[0]:self.experiment.marginOfBaseline[1]]
         self.interestWindow, self.baseline = self._normalizeToBaseline(self.interestWindow_raw, self.baselineWindow)
         self.setupFlags()
-        self._smoothen(smootheningTime, self.F_sample)
+        self._smoothen(self.smootheningTime, self.F_sample)
+        if self.experiment.type == "GABAzine":
+            normalized_interestWindow = self.interestWindow/np.mean(self.interestWindow)
+            #normalized_interestWindow = self.interestWindow + 0.
+            time = np.arange(len(self.interestWindow))*self.samplingTime
+            self.fit_using_lmfit (time, normalized_interestWindow,"xyz")
+            #popt, pcov = self.fitFunctionToPSP(time, normalized_interestWindow, "double_exponential")
+            #print popt, pcov
+            #plt.plot(time, normalized_interestWindow, alpha=0.2)
+            #psp_time = time[time > popt[0]]
+            #pre_psp_time = time[time <= popt[0]]
+            #plt.plot(psp_time, self._doubleExponentialFunction(psp_time,*popt))
+            #plt.plot(pre_psp_time, np.zeros(len(pre_psp_time)))
+            #plt.show()
 
         # All features here, move some features out of this for APs
         if not (self.AP_flag or self.baseline_flag or self.photodiode_flag):
@@ -198,8 +215,7 @@ class Trial:
     def _findTimeToPeak(self, samplingFreq):
         '''Finds the time to maximum of the vector in a given interest'''
         maxIndex = np.argmax(self.interestWindow)
-        samplingTime = (1./samplingFreq) # in seconds
-        timeToPeak = (maxIndex)*samplingTime
+        timeToPeak = (maxIndex)*self.samplingTime
         return timeToPeak 
     
     def _findMean(self):
@@ -208,19 +224,17 @@ class Trial:
     
     def _areaUnderTheCurve(self, samplingFreq):
         '''Finds the area under the curve of the vector in the given window. This will subtract negative area from the total area.'''
-        samplingTime = (1./samplingFreq) # in seconds
-        auc = np.trapz(self.interestWindow,dx=samplingTime) # in V.s
+        auc = np.trapz(self.interestWindow,dx=self.samplingTime) # in V.s
         return auc
 
     def _areaUnderTheCurveToPeak(self, samplingFreq):
         '''Finds the area under the curve of the vector in the given window'''
         maxIndex = np.argmax(self.interestWindow)
-        samplingTime = (1./samplingFreq) # in seconds
         windowToPeak = self.interestWindow[:maxIndex+1] 
-        auctp = np.trapz(windowToPeak,dx=samplingTime) # in V.s
+        auctp = np.trapz(windowToPeak,dx=self.samplingTime) # in V.s
         return auctp
 
-    def _findOnsetTime(self, samplingFreq, steps= 100, pValTolerance = 0.01):
+    def _findOnsetTime(self, samplingFreq, steps= 50, pValTolerance = 0.01):
         ''' Find the onset of the curve using a 2 sample KS test '''
         print "_findOnset doesn't work yet!"
         window_size = len(self.interestWindow_raw)
@@ -276,6 +290,47 @@ class Trial:
         smootheningWindow = smootheningTime*1e-3*samplingFreq
         window = np.ones(int(smootheningWindow)) / float(smootheningWindow)
         self.interestWindow = np.convolve(self.interestWindow, window, 'same')  # Subtracting baseline from whole array
+
+    ## Fits
+    print "Gabazine Fits are okay, but cleanup is required at this point"
+    def _doubleExponentialFunction(self, t, t_0, tOn, tOff, g_max):
+        ''' Returns the shape of an EPSP as a double exponential function '''
+        tPeak = t_0 + float(((tOff * tOn)/(tOff-tOn)) * np.log(tOff/tOn))
+        A = 1./(np.exp(-(tPeak-t_0)/tOff) - np.exp(-(tPeak-t_0)/tOn))
+        #g = g_max * A * (np.exp(-(t-t_0)/tOff) - np.exp(-(t-t_0)/tOn))
+        g = [ g_max * A * (np.exp(-(t_point-t_0)/tOff) - np.exp(-(t_point-t_0)/tOn)) if  t_point >= t_0 else 0.  for t_point in t]
+        return g
+    
+    def fitFunctionToPSP(self, time, vector, function):
+        if function == "double_exponential":
+            popt,pcov = curve_fit(self._doubleExponentialFunction,time,vector, bounds=(0, [max(time), max(time), max(time), max(vector)]), p0 = (max(time)/2., max(time)/4., max(time)/3., max(vector)))
+            #popt,pcov = curve_fit(self._doubleExponentialFunction,time,vector, p0 = (max(time)/2., max(time)/4., max(time)/3., max(vector)))
+        else:
+            print "No other function yet"
+        return popt, pcov
+
+    def fit_using_lmfit(self, time, vector, function):
+        ''' Fits using lmfit '''
+        def _doubleExponentialFunction(t, t_0, tOn, tOff, g_max):
+            ''' Returns the shape of an EPSP as a double exponential function '''
+            tPeak = t_0 + float(((tOff * tOn)/(tOff-tOn)) * np.log(tOff/tOn))
+            A = 1./(np.exp(-(tPeak-t_0)/tOff) - np.exp(-(tPeak-t_0)/tOn))
+            g = [ g_max * A * (np.exp(-(t_point-t_0)/tOff) - np.exp(-(t_point-t_0)/tOn)) if  t_point >= t_0 else 0.  for t_point in t]
+        return g
+
+        model = lmfit.Model(_doubleExponentialFunction)
+        model.set_param_hint('t_0', value =max(time)/10., min=0., max = max(time))
+        model.set_param_hint('tOn', value =max(time)/5.1 , min = 0., max = max(time))
+        model.set_param_hint('tOff', value =max(time)/5. , min = 0., max = max(time))
+        model.set_param_hint('g_max', value = max(vector)/1.1, min = 0., max = max(vector))
+        pars = model.make_params()
+
+        result = model.fit(vector, pars, t=time )
+        print(result.fit_report())
+        ax = plt.subplot(111)
+        ax.plot(time, vector, alpha=0.2)
+        ax.plot(time, result.best_fit, '-')
+        plt.show()
 
 class Coordinate:
     def __init__(self, coords, trials, experiment):

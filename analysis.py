@@ -60,7 +60,14 @@ for type in ['Control', 'GABAzine']:
         fullDict = readMatlabFile(CPP)
         voltageTrace, photoDiode = parseDictKeys(fullDict)
         marginOfBaseLine, marginOfInterest = find_BaseLine_and_WindowOfInterest_Margins(photoDiode,threshold, baselineWindowWidth, interestWindowWidth)
-        neuron.analyzeExperiment(type, numSquares, voltageTrace, photoDiode, coords, marginOfBaseLine, marginOfInterest,F_sample )
+        neuron.analyzeExperiment(type, numSquares, voltageTrace, photoDiode, coords, marginOfBaseLine, marginOfInterest,F_sample, smootheningTime )
+
+        #trials = neuron.experiment[type][numSquares].trial
+        #for trial in trials.values():
+        #    plt.plot(trial.interestWindow)
+        #    plt.vlines(trial.F_sample * trial.feature[6], min(trial.interestWindow),max(trial.interestWindow))
+        #    plt.show()
+
 
 if not os.path.exists(inputDir + '/plots/'):
     os.makedirs(inputDir + '/plots/')

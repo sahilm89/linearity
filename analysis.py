@@ -24,14 +24,15 @@ for type in ['Control', 'GABAzine']:
     
     gridSizeList = [''] + getInputSizeOfPhotoActiveGrid(experimentDir)
 
-    randX = experimentDir + 'coords/CPP_randX.txt'
-    randY = experimentDir + 'coords/CPP_randY.txt'
+    randX = experimentDir + 'coords/filtered_CPP_randX.txt'
+    randY = experimentDir + 'coords/filtered_CPP_randY.txt'
 
     coords = readBoxCSV(randX,randY)
     repeatSize = len(coords[0]) 
+    print repeatSize
 
-    randX = experimentDir + 'coords/randX.txt'
-    randY = experimentDir + 'coords/randY.txt'
+    randX = experimentDir + 'coords/new_randX.txt'
+    randY = experimentDir + 'coords/new_randY.txt'
 
     for squares in gridSizeList:
         createCoords(randX, randY, repeatSize, squares, experimentDir)
@@ -47,6 +48,7 @@ for type in ['Control', 'GABAzine']:
         #print [coord for coord in zip(coords[0], coords[1])]
         assert len(coords[0]) == len(coords[1]), "{},{}".format(len(coords[0]), len(coords[1]))
         coords = [(i,j) for i,j in zip(coords[0], coords[1])]
+        print coords
 
         CPP = experimentDir + 'CPP' + str(squares) + '.mat' 
 

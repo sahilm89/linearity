@@ -1,8 +1,7 @@
+import sys
 import numpy as np
 import scipy
 import scipy.stats as ss
-from scipy.optimize import curve_fit
-import lmfit
 import itertools as it
 import pickle # Can be used to save entire objects
 from collections import OrderedDict as ordered 
@@ -36,10 +35,7 @@ class Experiment:
     ''' Change this to key: [coords, photodiode, value]''' 
     def __init__(self, neuron, type, numSquares, voltage, photodiode, coords, marginOfBaseline, marginOfInterest, F_sample, smootheningTime):
         self.neuron = neuron
-        if type:
-            self.type = type 
-        else:
-            self.type = 'Control'
+        self.type = type 
         self.numSquares = numSquares 
         self.F_sample = F_sample
         self.samplingTime = 1./self.F_sample
@@ -153,19 +149,6 @@ class Trial:
         self.interestWindow, self.baseline = self._normalizeToBaseline(self.interestWindow_raw, self.baselineWindow)
         self.setupFlags()
         self._smoothen(self.smootheningTime, self.F_sample)
-        if self.experiment.type == "GABAzine":
-            normalized_interestWindow = self.interestWindow/np.mean(self.interestWindow)
-            #normalized_interestWindow = self.interestWindow + 0.
-            time = np.arange(len(self.interestWindow))*self.samplingTime
-            self.fit_using_lmfit (time, normalized_interestWindow,"xyz")
-            #popt, pcov = self.fitFunctionToPSP(time, normalized_interestWindow, "double_exponential")
-            #print popt, pcov
-            #plt.plot(time, normalized_interestWindow, alpha=0.2)
-            #psp_time = time[time > popt[0]]
-            #pre_psp_time = time[time <= popt[0]]
-            #plt.plot(psp_time, self._doubleExponentialFunction(psp_time,*popt))
-            #plt.plot(pre_psp_time, np.zeros(len(pre_psp_time)))
-            #plt.show()
 
         # All features here, move some features out of this for APs
         if not (self.AP_flag or self.baseline_flag or self.photodiode_flag):
@@ -236,7 +219,7 @@ class Trial:
 
     def _findOnsetTime(self, samplingFreq, steps= 50, pValTolerance = 0.01):
         ''' Find the onset of the curve using a 2 sample KS test '''
-        print "_findOnset doesn't work yet!"
+        #print "_findOnset doesn't work yet!"
         window_size = len(self.interestWindow_raw)
         step_size = window_size/steps
         index_right = step_size
@@ -244,7 +227,7 @@ class Trial:
             stat, pVal = ss.ks_2samp(self.baselineWindow, self.interestWindow_raw[index_left:index_right])
             index_right += step_size
             if pVal<pValTolerance:
-                print index_left, pVal, stat#, self.interestWindow_raw[index_left:index_right]
+                #print index_left, pVal, stat#, self.interestWindow_raw[index_left:index_right]
                 break
         return float(index_left)/samplingFreq
 
@@ -291,47 +274,6 @@ class Trial:
         window = np.ones(int(smootheningWindow)) / float(smootheningWindow)
         self.interestWindow = np.convolve(self.interestWindow, window, 'same')  # Subtracting baseline from whole array
 
-    ## Fits
-    print "Gabazine Fits are okay, but cleanup is required at this point"
-    def _doubleExponentialFunction(self, t, t_0, tOn, tOff, g_max):
-        ''' Returns the shape of an EPSP as a double exponential function '''
-        tPeak = t_0 + float(((tOff * tOn)/(tOff-tOn)) * np.log(tOff/tOn))
-        A = 1./(np.exp(-(tPeak-t_0)/tOff) - np.exp(-(tPeak-t_0)/tOn))
-        #g = g_max * A * (np.exp(-(t-t_0)/tOff) - np.exp(-(t-t_0)/tOn))
-        g = [ g_max * A * (np.exp(-(t_point-t_0)/tOff) - np.exp(-(t_point-t_0)/tOn)) if  t_point >= t_0 else 0.  for t_point in t]
-        return g
-    
-    def fitFunctionToPSP(self, time, vector, function):
-        if function == "double_exponential":
-            popt,pcov = curve_fit(self._doubleExponentialFunction,time,vector, bounds=(0, [max(time), max(time), max(time), max(vector)]), p0 = (max(time)/2., max(time)/4., max(time)/3., max(vector)))
-            #popt,pcov = curve_fit(self._doubleExponentialFunction,time,vector, p0 = (max(time)/2., max(time)/4., max(time)/3., max(vector)))
-        else:
-            print "No other function yet"
-        return popt, pcov
-
-    def fit_using_lmfit(self, time, vector, function):
-        ''' Fits using lmfit '''
-        def _doubleExponentialFunction(t, t_0, tOn, tOff, g_max):
-            ''' Returns the shape of an EPSP as a double exponential function '''
-            tPeak = t_0 + float(((tOff * tOn)/(tOff-tOn)) * np.log(tOff/tOn))
-            A = 1./(np.exp(-(tPeak-t_0)/tOff) - np.exp(-(tPeak-t_0)/tOn))
-            g = [ g_max * A * (np.exp(-(t_point-t_0)/tOff) - np.exp(-(t_point-t_0)/tOn)) if  t_point >= t_0 else 0.  for t_point in t]
-        return g
-
-        model = lmfit.Model(_doubleExponentialFunction)
-        model.set_param_hint('t_0', value =max(time)/10., min=0., max = max(time))
-        model.set_param_hint('tOn', value =max(time)/5.1 , min = 0., max = max(time))
-        model.set_param_hint('tOff', value =max(time)/5. , min = 0., max = max(time))
-        model.set_param_hint('g_max', value = max(vector)/1.1, min = 0., max = max(vector))
-        pars = model.make_params()
-
-        result = model.fit(vector, pars, t=time )
-        print(result.fit_report())
-        ax = plt.subplot(111)
-        ax.plot(time, vector, alpha=0.2)
-        ax.plot(time, result.best_fit, '-')
-        plt.show()
-
 class Coordinate:
     def __init__(self, coords, trials, experiment):
         self.coords = coords
@@ -345,9 +287,8 @@ class Coordinate:
         self.linearly_transformed_expected_feature = {} 
         self.linearly_transformed_average_feature = {} 
         self.flags = {}
-
         self._findAveraged()
-        self.feature = self. _setFeatures()
+        self.feature = self._setFeatures()
 
         if not self.numSquares == 1:
             self._findExpected()
@@ -369,6 +310,8 @@ class Coordinate:
         ''' Finds the average feature for the coord '''
         for feature in self.neuron.features:
             averageFeature = np.average([trial.feature[feature] for trial in self.trials if feature in trial.feature])
+            if feature == 0 and self.numSquares == 1 :
+                print self.coords, averageFeature
             if not np.isnan(averageFeature):
                 self.average_feature.update({feature : averageFeature})
 
@@ -379,7 +322,7 @@ class Coordinate:
     def _findExpected(self):
         ''' Finds the expected feature from one squares data '''
         for feature in self.feature:
-            self.expected_feature.update({feature: np.sum([self.neuron.experiment[self.type][1].coordwise[frozenset([coord])].average_feature[feature] for coord in self.coords])})
+            self.expected_feature.update({feature: np.sum([self.neuron.experiment[self.type][1].coordwise[frozenset([coord])].average_feature[feature] for coord in self.coords if frozenset([coord]) in self.neuron.experiment[self.type][1].coordwise.keys()])})
 
     def _linearTransform(self, value, minValue, maxValue):
         return (value - minValue)/(maxValue - minValue)

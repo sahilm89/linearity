@@ -1,6 +1,7 @@
 # Folders to not copy
 logs/
 temp/
+analyzed_temp/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

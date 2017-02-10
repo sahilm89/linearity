@@ -942,6 +942,8 @@ def createCoords(randX_file, randY_file, repeatSize, SizeOfPhotoactiveGrid, inpu
         randX = np.loadtxt(randX_file,delimiter=',')
         randY = np.loadtxt(randY_file,delimiter=',')
 
+        print "Repeat is", repeatSize, SizeOfPhotoactiveGrid
+
         randX_sizeBased = randX[:(repeatSize*SizeOfPhotoactiveGrid)]
         randY_sizeBased = randY[:(repeatSize*SizeOfPhotoactiveGrid)]
 

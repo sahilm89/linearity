@@ -172,12 +172,12 @@ def createCoordinatesFromOneSquareData(inputDir, plotResponse=False):
     #plt.hist(x,bins=max(x),alpha=0.5)
     #plt.show()
 
-    #fig = plt.figure()
-    #ax = fig.add_subplot(111)
-    #ax.scatter(x,y,c=range(len(x)))
-    #ax.set_xlim(0,numEdgeSquares)
-    #ax.set_ylim(0,numEdgeSquares)
-    #plt.show()
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.scatter(x,y,c=range(len(x)))
+    ax.set_xlim(0,numEdgeSquares)
+    ax.set_ylim(0,numEdgeSquares)
+    plt.show()
 
     if plotResponse:
 

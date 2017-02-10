@@ -36,18 +36,19 @@ plt.scatter(np.log10(exc_list), control_list)
 plt.show()
 
 color=iter(plt.cm.viridis(np.linspace(0,1,len(neuron.experiment[type]))))
-#for squares in neuron.experiment[type].keys(): 
-#    trial_features = []
-#    for index in neuron.experiment[type][squares].trial:
-#        if feature in neuron.experiment[type][squares].trial[index].feature: # Checking if features are missing due to flags.
-#            trial_features.append(neuron.experiment[type][squares].trial[index].linearly_transformed_feature[feature])
-#    plt.scatter(range(len(trial_features)), trial_features, label=str(squares), c=next(color)) 
-#plt.title(neuron.features[feature])
-#plt.xlabel("Trial Number")
-#plt.ylabel("Amplitude")
-#plt.legend(loc='upper right', bbox_to_anchor=(1,1))
-##plt.tight_layout()
-#plt.show()       
+
+for squares in neuron.experiment[type].keys(): 
+    trial_features = []
+    for index in neuron.experiment[type][squares].trial:
+        if feature in neuron.experiment[type][squares].trial[index].feature: # Checking if features are missing due to flags.
+            trial_features.append(neuron.experiment[type][squares].trial[index].feature[feature])
+    plt.scatter(range(len(trial_features)), trial_features, label=str(squares), c=next(color)) 
+plt.title(neuron.features[feature])
+plt.xlabel("Trial Number")
+plt.ylabel("Amplitude")
+plt.legend(loc='upper right', bbox_to_anchor=(1,1))
+#plt.tight_layout()
+plt.show()       
 
 ############################## Trial Checking ###############
 

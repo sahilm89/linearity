@@ -4,11 +4,13 @@ import pickle
 import numpy as np
 import scipy.stats as ss
 plt.style.use('seaborn-white')
+import statsmodels.api as sm
 
-fit1, fit2, fit3, fit4, fit5, fit6,fit_ratio = [],[],[],[],[],[],[]
+fit1, fit2, fit3, fit4, fit5, fit6, fit_ratio = [],[],[],[],[],[],[]
 #ax = plt.subplot(111)
 filelist = glob.glob('/media/sahil/NCBS_Shares_BGStim/patch_data/*/c?/plots/*.pkl')
 #filelist = ['/media/sahil/InternalHD/170208/c3/plots/c3.pkl']
+
 for file in filelist:
     print file
     try:
@@ -16,49 +18,51 @@ for file in filelist:
         gabazine_observed ={}
         control_expected = {}
         gabazine_expected ={}
-        feature = 1
+        feature = 0
+
         with open(file, 'rb') as input:
             neuron = pickle.load(input)
             for type in neuron.experiment:
                 slopeList, sqrList = [], []
                 for numSquares in neuron.experiment[type].keys(): 
                     if not numSquares == 1:
+                        nSquareData = neuron.experiment[type][numSquares]
                         if type == "Control":
-                            slopeList.append(neuron.experiment[type][numSquares].regression_coefficients[feature]['slope'])
+                            slopeList.append(nSquareData.regression_coefficients[feature]['slope'])
+                            coords_C = nSquareData.coordwise
                             sqrList.append(numSquares)
-                            slopeList.append(neuron.experiment[type][numSquares].regression_coefficients[feature]['slope'])
-                            coords_C = neuron.experiment[type][numSquares].coordwise
                             for coord in coords_C: 
                                 if feature in coords_C[coord].feature:
                                     control_observed.update({coord: coords_C[coord].average_feature[feature]})
                                     control_expected.update({coord: coords_C[coord].expected_feature[feature]})
                         elif type == "GABAzine":
-                            slopeList.append(neuron.experiment[type][numSquares].regression_coefficients[feature]['slope'])
+                            slopeList.append(nSquareData.regression_coefficients[feature]['slope'])
                             sqrList.append(numSquares)
-                            slopeList.append(neuron.experiment[type][numSquares].regression_coefficients[feature]['slope'])
-                            coords_I = neuron.experiment[type][numSquares].coordwise
+                            coords_I = nSquareData.coordwise
                             for coord in coords_I: 
                                 if feature in coords_I[coord].feature:
                                     gabazine_observed.update({coord:coords_I[coord].average_feature[feature]})
                                     gabazine_expected.update({coord:coords_I[coord].expected_feature[feature]})
 
+            print "Read {} into variables".format(file)
             list_control_observed   = []  
             list_gabazine_observed  = []
             list_control_expected   = []
             list_gabazine_expected  = []
-
+            tolerance = 1e-4
             for key in gabazine_observed.keys():
-                list_gabazine_observed.append(gabazine_observed[key])
-                list_gabazine_expected.append(gabazine_expected[key])
+                #if not (gabazine_observed[key] <0 or np.isclose(gabazine_observed[key], 0, atol=5e-4) or gabazine_expected[key]<0 or np.isclose(gabazine_expected[key], 0, atol=5e-4)):
+                if not (gabazine_observed[key] <0 or np.isclose(gabazine_observed[key], 0, atol=tolerance) or gabazine_expected[key]<0 or np.isclose(gabazine_expected[key], 0, atol=tolerance)):
+                    list_gabazine_observed.append(gabazine_observed[key])
+                    list_gabazine_expected.append(gabazine_expected[key])
 
             for key in control_observed.keys():
-                list_control_observed.append(control_observed[key])
-                list_control_expected.append(control_expected[key])
+                #if not (control_observed[key] <0 or np.isclose(control_observed[key], 0, atol=1e-4) or control_expected[key]<0 or np.isclose(control_expected[key], 0, atol=5e-4)):
+                if not (control_observed[key] <0 or np.isclose(control_observed[key], 0, atol=tolerance) or control_expected[key]<0 or np.isclose(control_expected[key], 0, atol=tolerance)):
+                    list_control_observed.append(control_observed[key])
+                    list_control_expected.append(control_expected[key])
 
             f, ax = plt.subplots(2,2)
-            #### Log expected vs Observed
-            #fit_log_g_e_g_o = zip(['slope', 'intercept', 'r_val', 'p_val', 'stderr'] , ss.linregress(np.log10(list_gabazine_expected), list_gabazine_observed))
-            #fit_log_c_e_c_o = zip(['slope', 'intercept', 'r_val', 'p_val', 'stderr'] , ss.linregress(np.log10(list_control_expected), list_control_observed))
 
             if len(list_gabazine_expected) and len(list_gabazine_observed):
                 fit_log_g_e_g_o = ss.linregress(np.log10(list_gabazine_expected), list_gabazine_observed)[2]
@@ -69,6 +73,19 @@ for file in filelist:
             if len(list_control_expected) and len(list_control_observed):
                 fit_log_c_e_c_o = ss.linregress(np.log10(list_control_expected), list_control_observed)[2]
                 fit_c_e_c_o = ss.linregress(list_control_expected, list_control_observed)[2]
+
+                #print  zip(list_control_expected, np.log(list_control_expected))
+                X = sm.add_constant(list_control_expected)
+                X_log = sm.add_constant(np.log(list_control_expected))
+
+                linearModel = sm.OLS(list_control_observed, X)
+                logModel = sm.OLS(list_control_observed, X_log)
+
+                result1 = linearModel.fit()
+                result2 = logModel.fit()
+                print result1.summary()
+                print result2.summary()
+
                 fit3.append(fit_c_e_c_o)
                 fit4.append(fit_log_c_e_c_o)
                 fit_ratio.append(fit_log_c_e_c_o/fit_c_e_c_o)
@@ -156,7 +173,7 @@ for file in filelist:
             plt.savefig("analyzed_temp/{}/{}_{}_comparisons.svg".format(neuron.features[feature], neuron.date, neuron.index))
             plt.close()
     except:
-        print "Some problem with this file. Check!"
+        print "Some problem with this file. Check {}! ".format(file)
         continue
 
 print fit1, fit2, fit3, fit4, fit5, fit6, fit_ratio
@@ -182,8 +199,8 @@ fit_ratio = np.array(fit_ratio)[~np.isnan(fit_ratio)]
 print fit1, fit2, fit3, fit4, fit5, fit6, fit_ratio
 fit1 =fit1[np.greater(fit1,0)] 
 fit2 =fit2[np.greater(fit2,0)]
-fit3 =fit3[np.greater(fit3,0)]
-fit4 =fit4[np.greater(fit4,0)]
+#fit3 =fit3[np.greater(fit3,0)]
+#fit4 =fit4[np.greater(fit4,0)]
 fit5 =fit5[np.greater(fit5,0)]
 fit6 =fit6[np.greater(fit6,0)]
 fit_ratio =fit_ratio[np.greater(fit_ratio,0)]
@@ -220,12 +237,15 @@ plt.tight_layout()
 plt.savefig("analyzed_temp/{}/{}_ratio_histogram.svg".format(neuron.features[feature],feature))
 plt.close()
 
+print fit3, fit4
 f, ax = plt.subplots(1,1)
 ax.scatter(fit3, fit4, color='c', label = "$R^2$")
+ax.plot(ax.get_xlim(), ax.get_ylim(), ls="--", c=".3")
 ax.set_xlabel("Lin")
 ax.set_ylabel("Log")
 ax.legend()
 f.suptitle("{}".format(feature))
+plt.gca().set_aspect('equal', adjustable='box')
 plt.tight_layout()
 plt.savefig("analyzed_temp/{}/{}_ratio_scatter.svg".format(neuron.features[feature],feature))
 plt.close()

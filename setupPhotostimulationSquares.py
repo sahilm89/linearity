@@ -2,11 +2,12 @@
 import sys
 import Linearity 
 import os
-from util import getInputSizeOfPhotoActiveGrid, readBoxCSV, readMatlabFile, parseDictKeys, find_BaseLine_and_WindowOfInterest_Margins, createCoords
+from util import getInputSizeOfPhotoActiveGrid, readBoxCSV, readMatlabFile, parseDictKeys, find_BaseLine_and_WindowOfInterest_Margins
 import matplotlib.pyplot as plt
 from analysisVariables import *
 import scipy.stats as ss
 import numpy as np
+import random
 import Tkinter, tkMessageBox, tkFileDialog
 
 def makePhotoStimulationGrid(numEdgeSquares, skipSquaresBy=1):
@@ -76,8 +77,6 @@ def createPhotoStimulation_init(outDirectory):
     with open(outDirectory + "/CPP_randY.txt",'w') as coordFile:
         coordFile.write(','.join( [str(i) for i in y[:len(circularGrid)]] ))
     
-    #plt.hist(x, bins=max(x),alpha=0.5)
-    
     jointX = []
     jointY = []
     for k in range(len(x)):
@@ -86,17 +85,31 @@ def createPhotoStimulation_init(outDirectory):
     for k in range(len(y)):
         jointY.append(y[k*len(circularGrid):(k+1)*len(circularGrid)])
     
-    #plt.hist(jointX,bins=max(x),alpha=0.5,stacked=True)
-    #plt.hist(x,bins=max(x),alpha=0.5)
-    #plt.show()
-    
-    #fig = plt.figure()
-    #ax = fig.add_subplot(111)
-    #ax.scatter(x,y,c=range(len(x)))
-    #ax.set_xlim(0,numEdgeSquares)
-    #ax.set_ylim(0,numEdgeSquares)
-    #plt.show()
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.scatter(x,y,c=range(len(x)))
+    ax.set_xlim(0,numEdgeSquares)
+    ax.set_ylim(0,numEdgeSquares)
+    plt.show()
 
+def sampleCoordinates(coordinateDict, number, mode='uniform', threshold_voltage=5e-4):
+    ''' Samples coordinates from the dictionary of coordinates and values provided, uniformly or largest'''
+
+    coord_list_pre, coord_values_pre = zip(*[ (key,coordinateDict[key]) for key in sorted(coordinateDict, key=coordinateDict.get) if coordinateDict[key]>threshold_voltage])
+    if mode == 'uniform':
+        bins = np.linspace(min(coord_values_pre), max(coord_values_pre), number)
+        bin_ids = np.digitize(coord_values_pre, bins)
+        sampled_bin_ids = []
+        for i in set(bin_ids):
+            #print i, np.where(bin_ids == i)[0]
+            sampled_bin_ids.append(random.choice(np.where(bin_ids == i)[0]))
+
+        print "Total number of sampled coordinates is {}".format(len(sampled_bin_ids))
+        return [coord_list_pre[j] for j in sampled_bin_ids]
+
+    elif mode == 'maximum':
+        print "Initial length of coordinates ", len(coord_list_pre)
+        return coord_list_pre[-number:]
 
 def createCoordinatesFromOneSquareData(inputDir, plotResponse=False):
     inputDir = os.path.abspath(inputDir)
@@ -117,8 +130,6 @@ def createCoordinatesFromOneSquareData(inputDir, plotResponse=False):
     randY = experimentDir + 'coords/randY.txt'
     
     CPP = experimentDir + 'CPP.mat'
-    #for squares in gridSizeList:
-    #    createCoords(randX, randY, repeatSize, squares, experimentDir)
     
     numSquares = 1
     assert len(coords[0]) == len(coords[1]), "{},{}".format(len(coords[0]), len(coords[1]))
@@ -134,17 +145,13 @@ def createCoordinatesFromOneSquareData(inputDir, plotResponse=False):
     for coord in coordwise:
         vmax_dict.update({list(coordwise[coord].coords)[0]: coordwise[coord].average_feature[0]})
     
-    print sorted(vmax_dict, key=vmax_dict.get)
     threshold_voltage = 5e-4
-    coord_list = [key for key in sorted(vmax_dict, key=vmax_dict.get) if vmax_dict[key]>threshold_voltage]
-    print len(coord_list)
-    coord_list = coord_list[-24:]
+    numCoords = 24
+    coord_list = sampleCoordinates(vmax_dict, numCoords)
     print len(coord_list)
 
     circularRandomStimulationGrid = createRandomPhotoStimulation(numSquareRepeats*len(coord_list), coord_list)
     x,y = returnCoordsFromGrid(circularRandomStimulationGrid) 
-
-    prefix = "/media/sahil/InternalHD/170208/c1/CPP/"
 
     with open(experimentDir + "coords/randX.txt",'w') as coordFile:
         coordFile.write(','.join( [str(i+1) for i in x] ))
@@ -234,8 +241,10 @@ numEdgeSquares = 13
 circleDiameter = 10
 skipSquaresBy = 2
 diagonalOnly = False
-circularGrid = makeCircularPhotostimulationGrid(numEdgeSquares,circleDiameter,skipSquaresBy=skipSquaresBy, diagonalOnly=diagonalOnly)
 numSquareRepeats = 10
+
+circularGrid = makeCircularPhotostimulationGrid(numEdgeSquares,circleDiameter,skipSquaresBy=skipSquaresBy, diagonalOnly=diagonalOnly)
+
 totalNumberOfSquares = numSquareRepeats * len(circularGrid)
 
 app = App()

@@ -8,8 +8,8 @@ import statsmodels.api as sm
 
 fit1, fit2, fit3, fit4, fit5, fit6, fit_ratio = [],[],[],[],[],[],[]
 #ax = plt.subplot(111)
-filelist = glob.glob('/media/sahil/NCBS_Shares_BGStim/patch_data/*/c?/plots/*.pkl')
-#filelist = ['/media/sahil/InternalHD/170208/c3/plots/c3.pkl']
+#filelist = glob.glob('/media/sahil/NCBS_Shares_BGStim/patch_data/*/c?/plots/*.pkl')
+filelist = ['/media/sahil/ABC/170220/c1/plots/c1.pkl']
 
 for file in filelist:
     print file
@@ -132,8 +132,7 @@ for file in filelist:
             control_observed  = np.array(list_control_observed)
             gabazine_observed = np.array(list_gabazine_observed)
             control_expected  = np.array(list_control_expected)
-            gabazine_expected = np.array(list_gabazine_expected)
-
+            gabazine_expected = np.array(list_gabazine_expected) 
             #### Log gabazine vs Control
             #fit_log-g-o_c-o = zip(['slope', 'intercept', 'r_val', 'p_val', 'stderr'] , ss.linregress(np.log10(gabazine_observed), control_observed))
             #fit_g-o_c-o = zip(['slope', 'intercept', 'r_val', 'p_val', 'stderr'] , ss.linregress(gabazine_observed, control_observed))

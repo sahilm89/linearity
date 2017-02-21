@@ -1,3 +1,6 @@
+# Analysis related constants
+randSeed = 202
+
 ## Plotting
 
 plotTypeList = ['svg', 'png']

@@ -4,7 +4,7 @@ import itertools as it
 import pickle   # Used to save complete Neuron objects
 from collections import OrderedDict as ordered
 import warnings
-
+import os
 
 class Neuron:
     ''' This is Experiment class for the photostimulation experiment '''
@@ -40,9 +40,11 @@ class Neuron:
             self.experiment[type][squares]._findRegressionCoefficients()
 
     def save(self, filename):
+        directory = os.path.dirname(filename)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
         with open(filename, 'wb') as output:
             pickle.dump(self, output, pickle.HIGHEST_PROTOCOL)
-
 
 class Experiment:
     ''' Change this to key: [coords, photodiode, value]'''
@@ -354,18 +356,19 @@ class Coordinate:
 
     def _findExpected(self):
         ''' Finds the expected feature from one squares data '''
-        for feature in self.feature:
-            sum_of_features = 0.
-            for coord in self.coords:
-                oneSquareCoordwise = self.neuron.experiment[self.type][1].coordwise
-                if frozenset([coord]) in oneSquareCoordwise.keys():
-                    if feature in oneSquareCoordwise[frozenset([coord])].average_feature:
-                        sum_of_features += oneSquareCoordwise[frozenset([coord])].average_feature[feature]
-                    else:
-                        sum_of_features = None
-                        break
-            if sum_of_features is not None:
-                self.expected_feature.update({feature: sum_of_features})
+        if 1 in self.neuron.experiment[self.type].keys():
+            for feature in self.feature:
+                sum_of_features = 0.
+                for coord in self.coords:
+                    oneSquareCoordwise = self.neuron.experiment[self.type][1].coordwise
+                    if frozenset([coord]) in oneSquareCoordwise.keys():
+                        if feature in oneSquareCoordwise[frozenset([coord])].average_feature:
+                            sum_of_features += oneSquareCoordwise[frozenset([coord])].average_feature[feature]
+                        else:
+                            sum_of_features = None
+                            break
+                if sum_of_features is not None:
+                    self.expected_feature.update({feature: sum_of_features})
 
     def _linearTransform(self, value, minValue, maxValue):
         return (value - minValue)/(maxValue - minValue)

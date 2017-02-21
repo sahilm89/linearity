@@ -38,7 +38,8 @@ for type in ['Control', 'GABAzine']:
     randY = experimentDir + 'coords/randY.txt'
 
     for squares in gridSizeList[1:]:
-        createCoords(randX, randY, repeatSize, squares, experimentDir)
+        if not (os.path.exists(experimentDir + 'coords/CPP' + str(squares) + '_randX.txt') or os.path.exists(experimentDir + 'coords/CPP' + str(squares) + '_randY.txt')):
+            createCoords(randX, randY, repeatSize, squares, experimentDir)
 
     color = iter(plt.cm.viridis(np.linspace(0, 1, len(gridSizeList))))
 
@@ -64,7 +65,7 @@ for type in ['Control', 'GABAzine']:
         fullDict = readMatlabFile(CPP)
         voltageTrace, photoDiode = parseDictKeys(fullDict)
         marginOfBaseLine, marginOfInterest = find_BaseLine_and_WindowOfInterest_Margins(photoDiode, threshold,
-                                                                                        baselineWindowWidth, interestWindowWidth)
+                baselineWindowWidth, interestWindowWidth)
         neuron.analyzeExperiment(type, numSquares, voltageTrace, photoDiode, coords, marginOfBaseLine, marginOfInterest,
                                  F_sample, smootheningTime)
 

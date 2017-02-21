@@ -8,6 +8,10 @@ import statsmodels.api as sm
 
 filelist = glob.glob('/media/sahil/NCBS_Shares_BGStim/patch_data/*/c?/plots/*.pkl')
 #f, (ax1, ax2) = plt.subplots(1, 2)
+result2_rsquared_adj = []
+result1_rsquared_adj = []
+var_expected = []
+tolerance = 5e-4
 for i, file in enumerate(filelist):
     print file
     try:
@@ -15,7 +19,7 @@ for i, file in enumerate(filelist):
         gabazine_observed ={}
         control_expected = {}
         gabazine_expected ={}
-        feature = 0
+        feature = 2
 
         with open(file, 'rb') as input:
             neuron = pickle.load(input)
@@ -50,7 +54,6 @@ for i, file in enumerate(filelist):
     list_gabazine_observed  = []
     list_control_expected   = []
     list_gabazine_expected  = []
-    tolerance = 9e-4
 
     if len(gabazine_observed):
         for key in gabazine_observed.keys():
@@ -67,7 +70,7 @@ for i, file in enumerate(filelist):
                     list_control_observed.append(element1)
                     list_control_expected.append(element2)
             
-        if len(list_control_expected) and len(list_control_observed):
+        if len(list_control_expected)>30 and len(list_control_observed)>30:
             X = np.array(list_control_expected)
             y = np.array(list_control_observed)
             X_log = np.log10(list_control_expected)
@@ -78,29 +81,42 @@ for i, file in enumerate(filelist):
             #const_X = X
             #const_X_log = X_log
 
-            linearModel = sm.GLS(y, const_X)
-            logModel = sm.GLS(y, const_X_log)
+            linearModel = sm.OLS(y, const_X)
+            logModel = sm.OLS(y, const_X_log)
 
             result1 = linearModel.fit()
             result2 = logModel.fit()
-            print result1.summary(), result2.summary()
+            #print result1.summary(), result2.summary()
 
-            f, (ax1, ax2) = plt.subplots(2,1)
-            #ax1 = plt.subplot()
-            ax1.plot(X, result1.predict(), 'r--', label='lin-fit')
-            ax1.scatter(X, y, label='data')
+            #f, (ax1, ax2) = plt.subplots(2,1)
+            ##ax1 = plt.subplot()
+            #ax1.plot(X, result1.predict(), 'r--', label='lin-fit')
+            #ax1.scatter(X, y, label='data')
 
-            ax2.plot(X_log, result2.predict(), 'g--', label='log-fit')
-            ax2.scatter(X_log, list_control_observed, label='data')
+            #ax2.plot(X_log, result2.predict(), 'g--', label='log-fit')
+            #ax2.scatter(X_log, list_control_observed, label='data')
 
-            ax1.legend()
-            ax2.legend()
-            plt.show()
-            plt.close()
-            # print result1.rsquared_adj, result2.rsquared_adj
-            #ax1.scatter(result1.rsquared_adj, result2.rsquared_adj)
-            ##ax2.scatter(result2.rsquared_adj/result1.rsquared_adj)
-            #ax2.scatter(i,result1.mse_resid/result2.mse_resid)
+            #ax1.legend()
+            #ax2.legend()
+            #plt.show()
+            #plt.close()
+            result2_rsquared_adj.append(result2.rsquared_adj)
+            result1_rsquared_adj.append(result1.rsquared_adj)
+            var_expected.append(np.var(list_control_expected))
+
+ax = plt.subplot()
+ax.scatter(var_expected, result2_rsquared_adj, color='b', label="Log Fits")
+ax.scatter(var_expected, result1_rsquared_adj, color='r', label="Linear Fits")
+plt.xlabel("Expected PSP variance")
+plt.ylabel("$R^2$")
+plt.legend()
+plt.show()
+
+
+# print result1.rsquared_adj, result2.rsquared_adj
+#ax1.scatter(result1.rsquared_adj, result2.rsquared_adj)
+##ax2.scatter(result2.rsquared_adj/result1.rsquared_adj)
+#ax2.scatter(i,result1.mse_resid/result2.mse_resid)
 #ax1.plot([0, 1], [0, 1], transform=ax1.transAxes)
 #ax2.axhline(y=1)
 #ax1.set_xlim((0,1))

@@ -9,6 +9,10 @@ import scipy.stats as ss
 import numpy as np
 import random
 import Tkinter, tkMessageBox, tkFileDialog
+import itertools
+
+numpy.random.seed = randSeed 
+random.seed = randSeed 
 
 def makePhotoStimulationGrid(numEdgeSquares, skipSquaresBy=1):
     photoStimGrid = []
@@ -47,15 +51,19 @@ def createRandomPhotoStimulation(totalNumberOfSquares, photoStimGrid):
     residualIndices = totalNumberOfSquares % len(photoStimGrid)
     if residualIndices:
         repeatedPhotoStimGrid = repeatedPhotoStimGrid[:((totalIterations-1)*len(photoStimGrid)) + residualIndices]
-    
     return repeatedPhotoStimGrid
 
 def returnCoordsFromGrid(photoStimGrid):
     xcoords = []
     ycoords = []
     for coords in photoStimGrid:
-        xcoords.append(coords[0])
-        ycoords.append(coords[1])
+        if type(coords[0])==int:
+            xcoords.append(coords[0])
+            ycoords.append(coords[1])
+        else:
+            for m in coords: 
+                xcoords.append(m[0])
+                ycoords.append(m[1])
     return xcoords, ycoords
 
 def createPhotoStimulation_init(outDirectory): 
@@ -92,19 +100,45 @@ def createPhotoStimulation_init(outDirectory):
     ax.set_ylim(0,numEdgeSquares)
     plt.show()
 
-def sampleCoordinates(coordinateDict, number, mode='uniform', threshold_voltage=5e-4):
+def sampleCoordinates(oneSquareDictionary, number, square = 1, mode='uniform', threshold_voltage=5e-4, max_voltage=3e-2):
     ''' Samples coordinates from the dictionary of coordinates and values provided, uniformly or largest'''
 
-    coord_list_pre, coord_values_pre = zip(*[ (key,coordinateDict[key]) for key in sorted(coordinateDict, key=coordinateDict.get) if coordinateDict[key]>threshold_voltage])
     if mode == 'uniform':
+        coordinateDict =  {}
+        comb = itertools.combinations(oneSquareDictionary, square)
+        for j in comb:
+            coordinateDict[j] = np.sum([oneSquareDictionary[k] for k in j])
+        plt.hist(coordinateDict.values())
+        plt.title(str(square) + " squares")
+        plt.xlabel("$V_{max}$")
+        plt.ylabel("Frequency")
+        plt.show()
+        plt.close()
+
+    elif mode == 'uniform_1sqr':
+        coordinateDict = oneSquareDictionary
+
+    if mode == 'uniform_1sqr' or 'uniform':
+        coord_list_pre, coord_values_pre = zip(*[ (key,coordinateDict[key]) for key in sorted(coordinateDict, key=coordinateDict.get) if (coordinateDict[key]>threshold_voltage and coordinateDict[key]<max_voltage)])
+
         bins = np.linspace(min(coord_values_pre), max(coord_values_pre), number)
         bin_ids = np.digitize(coord_values_pre, bins)
         sampled_bin_ids = []
         for i in set(bin_ids):
-            #print i, np.where(bin_ids == i)[0]
-            sampled_bin_ids.append(random.choice(np.where(bin_ids == i)[0]))
+            if len(np.where(bin_ids == i)):
+                sampled_bin_ids.append(random.choice(np.where(bin_ids == i)[0]))
 
-        print "Total number of sampled coordinates is {}".format(len(sampled_bin_ids))
+        while len(sampled_bin_ids)!=number:
+            print "Sampling non-uniformly for coord {} to preserve number of coords to be {}".format(len(sampled_bin_ids)+1,number)
+            random_bin = random.choice(list(set(bin_ids)))
+            sampled_bin_ids.append(random.choice(np.where(bin_ids == random_bin)[0]))
+        print "Total number of sampled coordinates for {} squares is {}".format(square, len(sampled_bin_ids))
+        plt.hist([coord_values_pre[j] for j in sampled_bin_ids], bins=24)
+        plt.title(str(square) + " squares")
+        plt.xlabel("$V_{max}$")
+        plt.ylabel("Frequency")
+        plt.show()
+        plt.close()
         return [coord_list_pre[j] for j in sampled_bin_ids]
 
     elif mode == 'maximum':
@@ -147,38 +181,27 @@ def createCoordinatesFromOneSquareData(inputDir, plotResponse=False):
     
     threshold_voltage = 5e-4
     numCoords = 24
-    coord_list = sampleCoordinates(vmax_dict, numCoords)
-    print len(coord_list)
+    squares = [1,2,3,5,7,9]
+    for square in squares:
+        coord_list = sampleCoordinates(vmax_dict, numCoords, square)
+        circularRandomStimulationGrid = createRandomPhotoStimulation(numSquareRepeats*len(coord_list), coord_list)
+        x,y = returnCoordsFromGrid(circularRandomStimulationGrid) 
+        print len(x), len(y)
 
-    circularRandomStimulationGrid = createRandomPhotoStimulation(numSquareRepeats*len(coord_list), coord_list)
-    x,y = returnCoordsFromGrid(circularRandomStimulationGrid) 
-
-    with open(experimentDir + "coords/randX.txt",'w') as coordFile:
-        coordFile.write(','.join( [str(i+1) for i in x] ))
+        with open(experimentDir + "coords/randX.txt",'w') as coordFile:
+            coordFile.write(','.join( [str(i+1) for i in x] ))
+        
+        with open(experimentDir + "coords/randY.txt",'w') as coordFile:
+            coordFile.write(','.join( [str(i+1) for i in y] ))
+        
+        with open(experimentDir + "coords/CPP" + str(square) + "_randX.txt",'w') as coordFile:
+            #coordFile.write(','.join( [str(i+1) for i in x[:len(coord_list)]] ))
+            coordFile.write(','.join( [str(i+1) for i in x] ))
+        
+        with open(experimentDir + "coords/CPP" + str(square) + "_randY.txt",'w') as coordFile:
+            #coordFile.write(','.join( [str(i+1) for i in y[:len(coord_list)]]))
+            coordFile.write(','.join( [str(i+1) for i in y]))
     
-    with open(experimentDir + "coords/randY.txt",'w') as coordFile:
-        coordFile.write(','.join( [str(i+1) for i in y] ))
-    
-    with open(experimentDir + "coords/filtered_CPP_randX.txt",'w') as coordFile:
-        coordFile.write(','.join( [str(i+1) for i in x[:len(coord_list)]] ))
-    
-    with open(experimentDir + "coords/filtered_CPP_randY.txt",'w') as coordFile:
-        coordFile.write(','.join( [str(i+1) for i in y[:len(coord_list)]]))
-    
-    #plt.hist(x, bins=max(x),alpha=0.5)
-    
-    jointX = []
-    jointY = []
-    for k in range(len(x)):
-        jointX.append(x[k*len(circularGrid):(k+1)*len(coord_list)])
-    
-    for k in range(len(y)):
-        jointY.append(y[k*len(circularGrid):(k+1)*len(coord_list)])
-    
-    #plt.hist(jointX,bins=max(x),alpha=0.5,stacked=True)
-    #plt.hist(x,bins=max(x),alpha=0.5)
-    #plt.show()
-
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.scatter(x,y,c=range(len(x)))

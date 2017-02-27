@@ -73,16 +73,16 @@ def createPhotoStimulation_init(outDirectory):
     
     x,y = returnCoordsFromGrid(circularRandomStimulationGrid) 
     
-    with open(outDirectory + "/randX.txt",'w') as coordFile:
+    with open(os.path.join(outDirectory , "randX.txt"),'w') as coordFile:
         coordFile.write(','.join( [str(i) for i in x] ))
     
-    with open(outDirectory + "/randY.txt",'w') as coordFile:
+    with open(os.path.join(outDirectory , "randY.txt"),'w') as coordFile:
         coordFile.write(','.join( [str(i) for i in y] ))
     
-    with open(outDirectory + "/CPP_randX.txt",'w') as coordFile:
+    with open(os.path.join(outDirectory , "CPP_randX.txt"),'w') as coordFile:
         coordFile.write(','.join( [str(i) for i in x[:len(circularGrid)]] ))
     
-    with open(outDirectory + "/CPP_randY.txt",'w') as coordFile:
+    with open(os.path.join(outDirectory , "CPP_randY.txt"),'w') as coordFile:
         coordFile.write(','.join( [str(i) for i in y[:len(circularGrid)]] ))
     
     jointX = []
@@ -187,23 +187,23 @@ def sampleCoordinates(oneSquareDictionary, number, square = 1, mode='uniform', t
 
 def createCoordinatesFromOneSquareData(inputDir, plotResponse=False):
     inputDir = os.path.abspath(inputDir)
-    index, date = inputDir.split('/')[::-1][:2]
+    index, date = inputDir.split(os.sep)[::-1][:2]
     
     neuron = Linearity.Neuron(index, date)
     print neuron.index, neuron.date 
     type = 'Control'
-    experimentDir = inputDir + '/CPP/'
+    experimentDir = os.path.join(inputDir , 'CPP')
     
-    randX = experimentDir + 'coords/CPP_randX.txt'
-    randY = experimentDir + 'coords/CPP_randY.txt'
+    randX = os.path.join(experimentDir , 'coords', 'CPP_randX.txt')
+    randY = os.path.join(experimentDir , 'coords', 'CPP_randY.txt')
     
     coords = readBoxCSV(randX,randY)
     repeatSize = len(coords[0])
     
-    randX = experimentDir + 'coords/randX.txt'
-    randY = experimentDir + 'coords/randY.txt'
+    randX = os.path.join(experimentDir , 'coords', 'randX.txt')
+    randY = os.path.join(experimentDir , 'coords', 'randY.txt')
     
-    CPP = experimentDir + 'CPP.mat'
+    CPP = os.path.join(experimentDir , 'CPP.mat')
     
     numSquares = 1
     assert len(coords[0]) == len(coords[1]), "{},{}".format(len(coords[0]), len(coords[1]))
@@ -221,24 +221,24 @@ def createCoordinatesFromOneSquareData(inputDir, plotResponse=False):
     
     threshold_voltage = 5e-4
     numCoords = 24
-    squares = [1,2,3,5,7,9]
+    squares = [2,3,5,7,9]
     for square in squares:
         coord_list = sampleCoordinates(vmax_dict, numCoords, square)
         circularRandomStimulationGrid = createRandomPhotoStimulation(numSquareRepeats*len(coord_list), coord_list)
         x,y = returnCoordsFromGrid(circularRandomStimulationGrid) 
         print len(x), len(y)
 
-        with open(experimentDir + "coords/randX.txt",'w') as coordFile:
+        with open(os.path.join(experimentDir , "coords", "randX.txt"),'w') as coordFile:
             coordFile.write(','.join( [str(i+1) for i in x] ))
         
-        with open(experimentDir + "coords/randY.txt",'w') as coordFile:
+        with open(os.path.join(experimentDir , "coords", "randY.txt"),'w') as coordFile:
             coordFile.write(','.join( [str(i+1) for i in y] ))
         
-        with open(experimentDir + "coords/CPP" + str(square) + "_randX.txt",'w') as coordFile:
+        with open(os.path.join(experimentDir , "coords", "CPP" + str(square) + "_randX.txt"),'w') as coordFile:
             #coordFile.write(','.join( [str(i+1) for i in x[:len(coord_list)]] ))
             coordFile.write(','.join( [str(i+1) for i in x] ))
         
-        with open(experimentDir + "coords/CPP" + str(square) + "_randY.txt",'w') as coordFile:
+        with open(os.path.join(experimentDir , "coords", "CPP" + str(square) + "_randY.txt"),'w') as coordFile:
             #coordFile.write(','.join( [str(i+1) for i in y[:len(coord_list)]]))
             coordFile.write(','.join( [str(i+1) for i in y]))
     

@@ -107,7 +107,7 @@ def parseDictKeys(fullDict):
         i+=1
     return voltageTrace, photoDiode
 
-def readBoxCSV(randx,randy):
+def readBoxCSV(randx,randy, length= 0):
     ''' Reading the CSV file into list of integers and finally tuples'''
     x = map (int, open(randx).read().splitlines()[0].split(','))
     y = map (int, open(randy).read().splitlines()[0].split(','))
@@ -115,7 +115,10 @@ def readBoxCSV(randx,randy):
     x = [ i-1 for i in x]
     y = [ i-1 for i in y]
 
-    return x,y
+    if not length:
+        return x,y
+    else:
+        return x[:length], y[:length]
 
 def find_BaseLine_and_WindowOfInterest_Margins(photodiode, threshold, baselineWindowWidth, interestWindowWidth):
     ''' Finding the base line windows using this function 

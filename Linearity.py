@@ -130,7 +130,7 @@ class Experiment:
     def _groupTrialsByCoords(self):
         coordwise = {}
         for trial in self.trial:
-            if self.trial[trial].coord not in self.coordwise:
+            if self.trial[trial].coord not in coordwise:
                 coordwise.update({self.trial[trial].coord: [self.trial[trial]]})
             else:
                 coordwise[self.trial[trial].coord].append(self.trial[trial])
@@ -183,6 +183,7 @@ class Trial:
         self.interestWindow, self.baseline = self._normalizeToBaseline(self.interestWindow_raw, self.baselineWindow)
         self.setupFlags()
         self._smoothen(self.smootheningTime, self.F_sample)
+        print self.index, self.coord
 
         # All features here, move some features out of this for APs
         if not (self.AP_flag or self.baseline_flag or self.photodiode_flag):
@@ -270,6 +271,7 @@ class Trial:
     def _flagActionPotentials(self, AP_threshold=3e-2):
         ''' This function flags if there is an AP trialwise and returns a dict of bools '''
         if np.max(self.interestWindow) > AP_threshold:
+            print "Action Potential in trial {}".format(self.index)
             return 1
         else:
             return 0
@@ -284,12 +286,13 @@ class Trial:
         ''' This function flags if the photodiode trace is too noisy '''
         return 0
 
-    def _flagNoise(self, pValTolerance=0.05):
+    def _flagNoise(self, pValTolerance=0.01):
         ''' This function asseses if the distributions of the baseline and interest are different or not '''
         m, pVal = ss.ks_2samp(self.baselineWindow, self.interestWindow)
         if pVal < pValTolerance:
             return 0
         else:
+            print "No response measured in trial {}".format(self.index)
             return 1  # Flagged as noisy
 
     # Transformations

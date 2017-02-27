@@ -9,6 +9,7 @@ import numpy as np
 
 inputDir = os.path.abspath(sys.argv[1])
 index, date = inputDir.split('/')[::-1][:2]
+numCoords = 24
 
 neuron = Linearity.Neuron(index, date)
 print neuron.index, neuron.date
@@ -39,6 +40,7 @@ for type in ['Control', 'GABAzine']:
 
     for squares in gridSizeList[1:]:
         if not (os.path.exists(experimentDir + 'coords/CPP' + str(squares) + '_randX.txt') or os.path.exists(experimentDir + 'coords/CPP' + str(squares) + '_randY.txt')):
+            print "Creating coordinates for {} squares".format(squares)
             createCoords(randX, randY, repeatSize, squares, experimentDir)
 
     color = iter(plt.cm.viridis(np.linspace(0, 1, len(gridSizeList))))
@@ -48,7 +50,7 @@ for type in ['Control', 'GABAzine']:
         randX = experimentDir + 'coords/CPP' + str(squares) + '_randX.txt'
         randY = experimentDir + 'coords/CPP' + str(squares) + '_randY.txt'
 
-        coords = readBoxCSV(randX, randY)
+        coords = readBoxCSV(randX, randY, length=squares*numCoords)
         # print [coord for coord in zip(coords[0], coords[1])]
         assert len(coords[0]) == len(coords[1]), "{},{}".format(len(coords[0]), len(coords[1]))
         coords = [(i, j) for i, j in zip(coords[0], coords[1])]
@@ -78,3 +80,4 @@ for type in ['Control', 'GABAzine']:
 if not os.path.exists(inputDir + '/plots/'):
     os.makedirs(inputDir + '/plots/')
 neuron.save(inputDir + '/plots/' + index + '.pkl')
+print "Wrote {}".format(inputDir + '/plots/' + index + '.pkl')

@@ -2,7 +2,10 @@ import numpy as np
 import pickle
 import matplotlib.pyplot as plt
 
-with open ("/home/sahil/Documents/Codes/bgstimPlasticity/data/august/161013/c1/plots/c1_try.pkl",'r') as p:
+analysisFile = os.path.abspath(sys.argv[1])
+plotDir = os.path.dirname(analysisFile)
+
+with open (analysisFile,'rb') as p:
     neuron = pickle.load(p)
 
 t_0, t_on, t_off, g_max, t_peak, sq  = [], [], [], [], [], []

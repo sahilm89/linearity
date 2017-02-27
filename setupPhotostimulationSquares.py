@@ -11,7 +11,7 @@ import random
 import Tkinter, tkMessageBox, tkFileDialog
 import itertools
 
-numpy.random.seed = randSeed 
+np.random.seed = randSeed 
 random.seed = randSeed 
 
 def makePhotoStimulationGrid(numEdgeSquares, skipSquaresBy=1):
@@ -104,41 +104,81 @@ def sampleCoordinates(oneSquareDictionary, number, square = 1, mode='uniform', t
     ''' Samples coordinates from the dictionary of coordinates and values provided, uniformly or largest'''
 
     if mode == 'uniform':
-        coordinateDict =  {}
+        #coordinateDict =  {}
+        coord_list_pre = []
+        coord_values_pre = []
         comb = itertools.combinations(oneSquareDictionary, square)
         for j in comb:
-            coordinateDict[j] = np.sum([oneSquareDictionary[k] for k in j])
-        plt.hist(coordinateDict.values())
-        plt.title(str(square) + " squares")
-        plt.xlabel("$V_{max}$")
-        plt.ylabel("Frequency")
-        plt.show()
-        plt.close()
+            sumValue = sum([oneSquareDictionary[k] for k in j])
+            if ( sumValue > max_voltage) or (sumValue < threshold_voltage): 
+                continue
+            else:
+                coord_list_pre.append(j)
+                coord_values_pre.append(sumValue)
 
-    elif mode == 'uniform_1sqr':
-        coordinateDict = oneSquareDictionary
+            #coordinateDict[j] = sum([oneSquareDictionary[k] for k in j])
+        #print "Dictionary created!"
+        #coord_list_pre, coord_values_pre = zip(*[ (key,coordinateDict[key]) for key in sorted(coordinateDict, key=coordinateDict.get) if (coordinateDict[key]>threshold_voltage and coordinateDict[key]<max_voltage)])
 
-    if mode == 'uniform_1sqr' or 'uniform':
-        coord_list_pre, coord_values_pre = zip(*[ (key,coordinateDict[key]) for key in sorted(coordinateDict, key=coordinateDict.get) if (coordinateDict[key]>threshold_voltage and coordinateDict[key]<max_voltage)])
+        coord_values_pre = np.array(coord_values_pre)
+        print coord_values_pre
 
-        bins = np.linspace(min(coord_values_pre), max(coord_values_pre), number)
+        #plt.hist(coord_values_pre)
+        #plt.title(str(square) + " squares")
+        #plt.xlabel("$V_{max}$")
+        #plt.ylabel("Frequency")
+        #plt.show()
+        #plt.close()
+
+        bins = np.linspace(np.min(coord_values_pre), np.max(coord_values_pre), number)
         bin_ids = np.digitize(coord_values_pre, bins)
         sampled_bin_ids = []
         for i in set(bin_ids):
             if len(np.where(bin_ids == i)):
                 sampled_bin_ids.append(random.choice(np.where(bin_ids == i)[0]))
+        while len(set(sampled_bin_ids))!=number:
+            print "Sampling non-uniformly for coord {} to preserve number of coords to be {}".format(len(sampled_bin_ids)+1,number)
+            random_bin = random.choice(list(set(bin_ids)))
+            sampled_bin_ids.append(random.choice(np.where(bin_ids == random_bin)[0]))
+        print "Total number of sampled coordinates for {} squares is {}".format(square, len(sampled_bin_ids))
+        #plt.hist([coord_values_pre[j] for j in sampled_bin_ids], bins=24)
+        #plt.title(str(square) + " squares")
+        #plt.xlabel("$V_{max}$")
+        #plt.ylabel("Frequency")
+        #plt.show()
+        #plt.close()
+        return [coord_list_pre[j] for j in sampled_bin_ids]
 
+    elif mode == 'uniform_1sqr':
+        coordinateDict = oneSquareDictionary
+        coord_list_pre, coord_values_pre = zip(*[ (key,coordinateDict[key]) for key in sorted(coordinateDict, key=coordinateDict.get) if (coordinateDict[key]>threshold_voltage and coordinateDict[key]<max_voltage)])
+
+        coord_values_pre = np.array(coord_values_pre)
+
+        #plt.hist(coord_values_pre)
+        #plt.title(str(square) + " squares")
+        #plt.xlabel("$V_{max}$")
+        #plt.ylabel("Frequency")
+        #plt.show()
+        #plt.close()
+
+        bins = np.linspace(np.min(coord_values_pre), np.max(coord_values_pre), number)
+        bin_ids = np.digitize(coord_values_pre, bins)
+        sampled_bin_ids = []
+        for i in set(bin_ids):
+            if len(np.where(bin_ids == i)):
+                sampled_bin_ids.append(random.choice(np.where(bin_ids == i)[0]))
         while len(sampled_bin_ids)!=number:
             print "Sampling non-uniformly for coord {} to preserve number of coords to be {}".format(len(sampled_bin_ids)+1,number)
             random_bin = random.choice(list(set(bin_ids)))
             sampled_bin_ids.append(random.choice(np.where(bin_ids == random_bin)[0]))
         print "Total number of sampled coordinates for {} squares is {}".format(square, len(sampled_bin_ids))
-        plt.hist([coord_values_pre[j] for j in sampled_bin_ids], bins=24)
-        plt.title(str(square) + " squares")
-        plt.xlabel("$V_{max}$")
-        plt.ylabel("Frequency")
-        plt.show()
-        plt.close()
+        #plt.hist([coord_values_pre[j] for j in sampled_bin_ids], bins=24)
+        #plt.title(str(square) + " squares")
+        #plt.xlabel("$V_{max}$")
+        #plt.ylabel("Frequency")
+        #plt.show()
+        #plt.close()
         return [coord_list_pre[j] for j in sampled_bin_ids]
 
     elif mode == 'maximum':

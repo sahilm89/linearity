@@ -116,38 +116,41 @@ def sampleCoordinates(oneSquareDictionary, number, square = 1, mode='uniform', t
                 coord_list_pre.append(j)
                 coord_values_pre.append(sumValue)
 
-            #coordinateDict[j] = sum([oneSquareDictionary[k] for k in j])
-        #print "Dictionary created!"
-        #coord_list_pre, coord_values_pre = zip(*[ (key,coordinateDict[key]) for key in sorted(coordinateDict, key=coordinateDict.get) if (coordinateDict[key]>threshold_voltage and coordinateDict[key]<max_voltage)])
-
         coord_values_pre = np.array(coord_values_pre)
         print coord_values_pre
 
-        #plt.hist(coord_values_pre)
-        #plt.title(str(square) + " squares")
-        #plt.xlabel("$V_{max}$")
-        #plt.ylabel("Frequency")
-        #plt.show()
-        #plt.close()
+        plt.hist(coord_values_pre)
+        plt.title(str(square) + " squares")
+        plt.xlabel("$V_{max}$")
+        plt.ylabel("Frequency")
+        plt.show()
+        plt.close()
 
         bins = np.linspace(np.min(coord_values_pre), np.max(coord_values_pre), number)
         bin_ids = np.digitize(coord_values_pre, bins)
+        numBins = number
+
+        while len(set(bin_ids))<number:
+            bins = np.linspace(np.min(coord_values_pre), np.max(coord_values_pre), numBins)
+            bin_ids = np.digitize(coord_values_pre, bins)
+            numBins+=1
+
         sampled_bin_ids = []
         for i in set(bin_ids):
             if len(np.where(bin_ids == i)):
                 sampled_bin_ids.append(random.choice(np.where(bin_ids == i)[0]))
-        while len(set(sampled_bin_ids))!=number:
-            print "Sampling non-uniformly for coord {} to preserve number of coords to be {}".format(len(sampled_bin_ids)+1,number)
-            random_bin = random.choice(list(set(bin_ids)))
-            sampled_bin_ids.append(random.choice(np.where(bin_ids == random_bin)[0]))
+        #while len(set(sampled_bin_ids))!=number:
+        #    print "Sampling non-uniformly for coord {} to preserve number of coords to be {}".format(len(sampled_bin_ids)+1,number)
+        #    random_bin = random.choice(list(set(bin_ids)))
+        #    sampled_bin_ids.append(random.choice(np.where(bin_ids == random_bin)[0]))
         print "Total number of sampled coordinates for {} squares is {}".format(square, len(sampled_bin_ids))
-        #plt.hist([coord_values_pre[j] for j in sampled_bin_ids], bins=24)
-        #plt.title(str(square) + " squares")
-        #plt.xlabel("$V_{max}$")
-        #plt.ylabel("Frequency")
-        #plt.show()
-        #plt.close()
-        return [coord_list_pre[j] for j in sampled_bin_ids]
+        plt.hist([coord_values_pre[j] for j in sampled_bin_ids], bins=24)
+        plt.title(str(square) + " squares")
+        plt.xlabel("$V_{max}$")
+        plt.ylabel("Frequency")
+        plt.show()
+        plt.close()
+        return [coord_list_pre[j] for j in sampled_bin_ids], np.max(coord_values_pre)
 
     elif mode == 'uniform_1sqr':
         coordinateDict = oneSquareDictionary
@@ -223,23 +226,21 @@ def createCoordinatesFromOneSquareData(inputDir, plotResponse=False):
     numCoords = 24
     squares = [2,3,5,7,9]
     for square in squares:
-        coord_list = sampleCoordinates(vmax_dict, numCoords, square)
+        coord_list, threshold_voltage = sampleCoordinates(vmax_dict, numCoords, square, threshold_voltage = threshold_voltage)
         circularRandomStimulationGrid = createRandomPhotoStimulation(numSquareRepeats*len(coord_list), coord_list)
         x,y = returnCoordsFromGrid(circularRandomStimulationGrid) 
         print len(x), len(y)
 
-        with open(os.path.join(experimentDir , "coords", "randX.txt"),'w') as coordFile:
-            coordFile.write(','.join( [str(i+1) for i in x] ))
-        
-        with open(os.path.join(experimentDir , "coords", "randY.txt"),'w') as coordFile:
-            coordFile.write(','.join( [str(i+1) for i in y] ))
+        #with open(os.path.join(experimentDir , "coords", "randX.txt"),'w') as coordFile:
+        #    coordFile.write(','.join( [str(i+1) for i in x] ))
+        #
+        #with open(os.path.join(experimentDir , "coords", "randY.txt"),'w') as coordFile:
+        #    coordFile.write(','.join( [str(i+1) for i in y] ))
         
         with open(os.path.join(experimentDir , "coords", "CPP" + str(square) + "_randX.txt"),'w') as coordFile:
-            #coordFile.write(','.join( [str(i+1) for i in x[:len(coord_list)]] ))
             coordFile.write(','.join( [str(i+1) for i in x] ))
         
         with open(os.path.join(experimentDir , "coords", "CPP" + str(square) + "_randY.txt"),'w') as coordFile:
-            #coordFile.write(','.join( [str(i+1) for i in y[:len(coord_list)]]))
             coordFile.write(','.join( [str(i+1) for i in y]))
     
     fig = plt.figure()
@@ -304,7 +305,7 @@ numEdgeSquares = 13
 circleDiameter = 10
 skipSquaresBy = 2
 diagonalOnly = False
-numSquareRepeats = 10
+numSquareRepeats = 1
 
 circularGrid = makeCircularPhotostimulationGrid(numEdgeSquares,circleDiameter,skipSquaresBy=skipSquaresBy, diagonalOnly=diagonalOnly)
 

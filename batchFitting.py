@@ -7,7 +7,7 @@ plt.style.use('seaborn-white')
 import statsmodels.api as sm
 
 #filelist = glob.glob('/media/sahil/NCBS_Shares_BGStim/patch_data/*/c?/plots/*.pkl')
-filelist = ['/media/sahil/InternalHD/c2/plots/c2.pkl'] 
+filelist = ['/media/sahil/Orange/c1/plots/c1.pkl'] 
 #f, (ax1, ax2) = plt.subplots(1, 2)
 control_result2_rsquared_adj = []
 control_result1_rsquared_adj = []

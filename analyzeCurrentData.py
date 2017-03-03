@@ -111,8 +111,8 @@ inputDir = os.path.abspath(sys.argv[1])
 index, date = inputDir.split('/')[::-1][:2]
 
 plotFile = inputDir + '/plots/' + index + '.pkl'
-#neuron = setup(inputDir, index, date)
-#neuron.save(plotFile)
+neuron = setup(inputDir, index, date)
+neuron.save(plotFile)
 
 with open(plotFile, 'rb') as input:
     neuron = pickle.load(input)

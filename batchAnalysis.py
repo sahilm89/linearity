@@ -8,8 +8,8 @@ import statsmodels.api as sm
 
 fit1, fit2, fit3, fit4, fit5, fit6, fit_ratio = [],[],[],[],[],[],[]
 #ax = plt.subplot(111)
-#filelist = glob.glob('/media/sahil/NCBS_Shares_BGStim/patch_data/*/c?/plots/*.pkl')
-filelist = ['/media/sahil/ABC/170220/c1/plots/c1.pkl']
+filelist = glob.glob('/media/sahil/NCBS_Shares_BGStim/patch_data/*/c?/plots/*.pkl')
+#filelist = ['/media/sahil/ABC/170220/c1/plots/c1.pkl']
 
 for file in filelist:
     print file
@@ -33,23 +33,23 @@ for file in filelist:
                             sqrList.append(numSquares)
                             for coord in coords_C: 
                                 if feature in coords_C[coord].feature:
-                                    control_observed.update({coord: coords_C[coord].average_feature[feature]})
-                                    control_expected.update({coord: coords_C[coord].expected_feature[feature]})
+                                    control_observed.update({coord: 1e3*coords_C[coord].average_feature[feature]})
+                                    control_expected.update({coord: 1e3*coords_C[coord].expected_feature[feature]})
                         elif type == "GABAzine":
                             slopeList.append(nSquareData.regression_coefficients[feature]['slope'])
                             sqrList.append(numSquares)
                             coords_I = nSquareData.coordwise
                             for coord in coords_I: 
                                 if feature in coords_I[coord].feature:
-                                    gabazine_observed.update({coord:coords_I[coord].average_feature[feature]})
-                                    gabazine_expected.update({coord:coords_I[coord].expected_feature[feature]})
+                                    gabazine_observed.update({coord:1e3*coords_I[coord].average_feature[feature]})
+                                    gabazine_expected.update({coord:1e3*coords_I[coord].expected_feature[feature]})
 
             print "Read {} into variables".format(file)
             list_control_observed   = []  
             list_gabazine_observed  = []
             list_control_expected   = []
             list_gabazine_expected  = []
-            tolerance = 1e-4
+            tolerance = 1e-1
             for key in gabazine_observed.keys():
                 #if not (gabazine_observed[key] <0 or np.isclose(gabazine_observed[key], 0, atol=5e-4) or gabazine_expected[key]<0 or np.isclose(gabazine_expected[key], 0, atol=5e-4)):
                 if not (gabazine_observed[key] <0 or np.isclose(gabazine_observed[key], 0, atol=tolerance) or gabazine_expected[key]<0 or np.isclose(gabazine_expected[key], 0, atol=tolerance)):
@@ -83,15 +83,15 @@ for file in filelist:
 
                 result1 = linearModel.fit()
                 result2 = logModel.fit()
-                print result1.summary()
-                print result2.summary()
+                #print result1.summary()
+                #print result2.summary()
 
                 fit3.append(fit_c_e_c_o)
                 fit4.append(fit_log_c_e_c_o)
                 fit_ratio.append(fit_log_c_e_c_o/fit_c_e_c_o)
 
-            ax[0][0].scatter(np.log10(list_gabazine_expected), list_gabazine_observed, label="Gabazine", c= "g", edgecolor='none')
-            ax[0][0].scatter(np.log10(list_control_expected), list_control_observed, label="Control", c= "c", edgecolor='none')
+            ax[0][0].scatter(np.log10(list_gabazine_expected), list_gabazine_observed, label="Gabazine $R^2$ {}".format(fit_log_g_e_g_o), c= "g", edgecolor='none')
+            ax[0][0].scatter(np.log10(list_control_expected), list_control_observed, label="Control $R^2$ {}".format(fit_log_c_e_c_o), c= "c", edgecolor='none')
             ax[0][0].set_title("log(E) vs O plot")
             ax[0][0].set_xlabel("log(e)")
             ax[0][0].set_ylabel("o")
@@ -108,8 +108,8 @@ for file in filelist:
             #fit_g-e_g-o = zip(['slope', 'intercept', 'r_val', 'p_val', 'stderr'] , ss.linregress(list_gabazine_expected, list_gabazine_observed))
             #fit_c-e_c-o = zip(['slope', 'intercept', 'r_val', 'p_val', 'stderr'] , ss.linregress(list_control_expected, list_control_observed))
 
-            ax[1][0].scatter(list_gabazine_expected, list_gabazine_observed, label="Gabazine", c= "g", edgecolor='none')
-            ax[1][0].scatter(list_control_expected, list_control_observed, label="Control", c= "c", edgecolor='none')
+            ax[1][0].scatter(list_gabazine_expected, list_gabazine_observed, label="Gabazine $R^2$ {}".format(fit_g_e_g_o), c= "g", edgecolor='none')
+            ax[1][0].scatter(list_control_expected, list_control_observed, label="Control $R^2$ {}".format(fit_c_e_c_o), c= "c", edgecolor='none')
             ax[1][0].set_title("E vs O plot")
             ax[1][0].set_xlabel("e")
             ax[1][0].set_ylabel("o")

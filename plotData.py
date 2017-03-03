@@ -115,3 +115,33 @@ for type in neuron.experiment.keys():
     #plt.show()
     plt.savefig("{}/{}_scatter_raw".format(plotPath, type)) 
     plt.close()
+
+
+
+
+
+for type in neuron.experiment.keys():
+    color=iter(plt.cm.viridis(np.linspace(0,1,len(neuron.experiment[type]))))
+    ax = plt.subplot(111)
+    feature = 0
+    for numSquares in neuron.experiment[type].keys(): 
+        if not numSquares == 1:
+            c =next(color)
+            expected, observed = [], []
+            for coord in neuron.experiment[type][numSquares].coordwise.keys():
+                if feature in neuron.experiment[type][numSquares].coordwise[coord].feature:
+                    observed.append(neuron.experiment[type][numSquares].coordwise[coord].average_feature[feature])
+                    expected.append(neuron.experiment[type][numSquares].coordwise[coord].expected_feature[feature])
+            E = 1e3*np.array(expected)
+            O = 1e3*np.array(observed)
+            ax.scatter(E,O, c = c)
+            slope, intercept  = neuron.experiment[type][numSquares].regression_coefficients[feature]['slope'], neuron.experiment[type][numSquares].regression_coefficients[feature]['intercept']
+            ynew = slope*E + 1e3*intercept
+            ax.plot(E, ynew, c=c, label='{},m= {:.2f}'.format(numSquares, slope))
+plt.legend()
+plt.xlabel('Expected (mV)')
+plt.ylabel('Observed (mV)')
+plt.title(neuron.features[feature])
+plt.savefig("{}/{}_scatter_averaged_both".format(plotPath, type)) 
+#plt.show()
+plt.close()

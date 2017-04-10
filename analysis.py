@@ -20,8 +20,8 @@ for type in ['Control', 'GABAzine']:
         experimentDir = inputDir + '/' + 'CPP/'
     else:
         experimentDir = inputDir + '/' + type + '/' + 'CPP/'
-        if not os.path.exists(experimentDir):
-            break
+    if not os.path.exists(experimentDir):
+        break
 
     gridSizeList = [''] + getInputSizeOfPhotoActiveGrid(experimentDir)
 
@@ -39,6 +39,7 @@ for type in ['Control', 'GABAzine']:
     randY = experimentDir + 'coords/randY.txt'
 
     for squares in gridSizeList[1:]:
+        print squares
         if not (os.path.exists(experimentDir + 'coords/CPP' + str(squares) + '_randX.txt') or os.path.exists(experimentDir + 'coords/CPP' + str(squares) + '_randY.txt')):
             print "Creating coordinates for {} squares".format(squares)
             createCoords(randX, randY, repeatSize, squares, experimentDir)
@@ -68,8 +69,12 @@ for type in ['Control', 'GABAzine']:
         voltageTrace, photoDiode = parseDictKeys(fullDict)
         marginOfBaseLine, marginOfInterest = find_BaseLine_and_WindowOfInterest_Margins(photoDiode, threshold,
                 baselineWindowWidth, interestWindowWidth)
-        neuron.analyzeExperiment(type, numSquares, voltageTrace, photoDiode, coords, marginOfBaseLine, marginOfInterest,
+        if any(x in experimentDir.split('/')[-2] for x in ['CS', 'spikes']):
+            neuron.analyzeExperiment(type, numSquares, voltageTrace, photoDiode, coords, marginOfBaseLine, marginOfInterest,
                                  F_sample, smootheningTime)
+        else:
+            neuron.analyzeExperiment(type, numSquares, voltageTrace, photoDiode, coords, marginOfBaseLine, marginOfInterest,
+                                 F_sample, smootheningTime, removeAP=True, filtering=filtering)
 
         # trials = neuron.experiment[type][numSquares].trial
         # for trial in trials.values():

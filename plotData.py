@@ -71,11 +71,11 @@ for type in neuron.experiment.keys():
                 if feature in neuron.experiment[type][numSquares].coordwise[coord].feature:
                     observed.append(neuron.experiment[type][numSquares].coordwise[coord].average_feature[feature])
                     expected.append(neuron.experiment[type][numSquares].coordwise[coord].expected_feature[feature])
-            E = 1e3*np.array(expected)
-            O = 1e3*np.array(observed)
+            E = np.array(expected)
+            O = np.array(observed)
             ax.scatter(E,O, c = c)
             slope, intercept  = neuron.experiment[type][numSquares].regression_coefficients[feature]['slope'], neuron.experiment[type][numSquares].regression_coefficients[feature]['intercept']
-            ynew = slope*E + 1e3*intercept
+            ynew = slope*E + intercept
             ax.plot(E, ynew, c=c, label='{},m= {:.2f}'.format(numSquares, slope))
     plt.legend()
     plt.xlabel('Expected (mV)')
@@ -100,11 +100,11 @@ for type in neuron.experiment.keys():
                     if feature in trial.feature:
                         observed.append(trial.feature[feature])
                         expected.append(neuron.experiment[type][numSquares].coordwise[coord].expected_feature[feature])
-            E = 1e3*np.array(expected)
-            O = 1e3*np.array(observed)
+            E = np.array(expected)
+            O = np.array(observed)
             ax.scatter(E,O, c = c)
             slope, intercept  = neuron.experiment[type][numSquares].regression_coefficients[feature]['slope'], neuron.experiment[type][numSquares].regression_coefficients[feature]['intercept']
-            ynew = slope*E + 1e3*intercept
+            ynew = slope*E + intercept
             ax.plot(E, ynew, c=c, label='{},m= {:.2f}'.format(numSquares, slope))
             print type, len(trials), len(set(trials))
 
@@ -132,11 +132,11 @@ for type in neuron.experiment.keys():
                 if feature in neuron.experiment[type][numSquares].coordwise[coord].feature:
                     observed.append(neuron.experiment[type][numSquares].coordwise[coord].average_feature[feature])
                     expected.append(neuron.experiment[type][numSquares].coordwise[coord].expected_feature[feature])
-            E = 1e3*np.array(expected)
-            O = 1e3*np.array(observed)
+            E = np.array(expected)
+            O = np.array(observed)
             ax.scatter(E,O, c = c)
             slope, intercept  = neuron.experiment[type][numSquares].regression_coefficients[feature]['slope'], neuron.experiment[type][numSquares].regression_coefficients[feature]['intercept']
-            ynew = slope*E + 1e3*intercept
+            ynew = slope*E + intercept
             ax.plot(E, ynew, c=c, label='{},m= {:.2f}'.format(numSquares, slope))
 plt.legend()
 plt.xlabel('Expected (mV)')

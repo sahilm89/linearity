@@ -45,7 +45,9 @@ def parseDictKeys(fullDict):
 
 def analyzeExperiment(instance, type, squares, voltage, photodiode, coords,
                       marginOfBaseLine, marginOfInterest,
-                      F_sample, smootheningTime):
+                      F_sample, smootheningTime, filtering=''):
+    instance.filtering = filtering
+    instance.removeAP = False
     if type not in instance.experiment:
         instance.experiment[type] = {squares: Experiment(instance, type, squares,
                                  voltage, photodiode, coords,
@@ -60,8 +62,8 @@ def analyzeExperiment(instance, type, squares, voltage, photodiode, coords,
 
     instance.experiment[type][squares]._groupTrialsByCoords()  # Coord grouping
 
-def setup(inputDir, index, date):
-    neuron = Linearity.Neuron(index, date)
+def setup(inputDir, index, date, save_trial=False):
+    neuron = Linearity.Neuron(index, date, save_trial)
     print neuron.index, neuron.date
     
     experimentDir = inputDir + '/' + 'CPP/'
@@ -103,7 +105,7 @@ def setup(inputDir, index, date):
                             baselineWindowWidth, interestWindowWidth)
     
             analyzeExperiment(neuron, type, numSquares, currentType[type], photoDiode[type], coords, marginOfBaseLine, marginOfInterest,
-                    F_sample, smootheningTime)
+                    F_sample, smootheningTime, filtering = 'bessel')
 
     return neuron
 
@@ -111,7 +113,7 @@ inputDir = os.path.abspath(sys.argv[1])
 index, date = inputDir.split('/')[::-1][:2]
 
 plotFile = inputDir + '/plots/' + index + '.pkl'
-neuron = setup(inputDir, index, date)
+neuron = setup(inputDir, index, date, save_trial=True)
 neuron.save(plotFile)
 
 with open(plotFile, 'rb') as input:
@@ -135,7 +137,7 @@ for type in neuron.experiment.keys():
                 inhib.append(abs(currentVals.coordwise[coord].average_feature[0]))
                 onset_i.append(currentVals.coordwise[coord].average_feature[6])
 
-excit, inhib =  1e9*np.array(excit), 1e9*np.array(inhib)
+excit, inhib =  1e6*np.array(excit), 1e6*np.array(inhib) # Already in mA
 onset_e, onset_i = np.array(onset_e), np.array(onset_i)
 print onset_i, onset_e
 

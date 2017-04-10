@@ -5,9 +5,10 @@ import numpy as np
 import scipy.stats as ss
 plt.style.use('seaborn-white')
 import statsmodels.api as sm
+from statsmodels.sandbox.regression.predstd import wls_prediction_std
 
-#filelist = glob.glob('/media/sahil/NCBS_Shares_BGStim/patch_data/*/c?/plots/*.pkl')
-filelist = ['/media/sahil/Orange/c1/plots/c1.pkl'] 
+filelist = glob.glob('/media/sahil/NCBS_Shares_BGStim/patch_data/*/c?/plots/*.pkl')
+#filelist = ['/home/sahil/Documents/Codes/bgstimPlasticity/data/august/161013/c1/plots/c1.pkl']
 #f, (ax1, ax2) = plt.subplots(1, 2)
 control_result2_rsquared_adj = []
 control_result1_rsquared_adj = []
@@ -92,33 +93,40 @@ for i, file in enumerate(filelist):
     if len(list_control_expected)>30 and len(list_control_observed)>30:
         X = np.array(list_control_expected)
         y = np.array(list_control_observed)
-        X_log = np.log10(list_control_expected)
+        idx   = np.argsort(X)
 
-        const_X = sm.add_constant(X)
-        const_X_log = sm.add_constant(X_log)
+        X = X[idx]
+        y = y[idx]
 
-        #const_X = X
-        #const_X_log = X_log
+        X_log = np.log10(X)
+
+        #const_X = sm.add_constant(X)
+        #const_X_log = sm.add_constant(X_log)
+
+        const_X = X
+        const_X_log = X_log
+
+        #linearModel = sm.RLM(y, const_X, M = sm.robust.norms.HuberT())
+        #logModel = sm.RLM(y, const_X_log, M = sm.robust.norms.HuberT())
 
         linearModel = sm.OLS(y, const_X)
         logModel = sm.OLS(y, const_X_log)
 
         result1 = linearModel.fit()
         result2 = logModel.fit()
+
+        print result1.params, result2.params, result1.pvalues, result2.pvalues
         print result1.summary(), result2.summary()
 
-        #f, (ax1, ax2) = plt.subplots(2,1)
-        ##ax1 = plt.subplot()
-        #ax1.plot(X, result1.predict(), 'r--', label='lin-fit')
-        #ax1.scatter(X, y, label='data')
+        f,ax = plt.subplots()
+        #ax1 = plt.subplot()
+        ax.scatter(X, y, label='data')
+        ax.plot(X, result1.params[0]*X, 'r--', label='lin-fit')
+        ax.plot(X, result2.params[0]*np.log10(X), 'g--', label='log-fit')
 
-        #ax2.plot(X_log, result2.predict(), 'g--', label='log-fit')
-        #ax2.scatter(X_log, y, label='data')
-
-        #ax1.legend()
-        #ax2.legend()
-        #plt.show()
-        #plt.close()
+        ax.legend()
+        plt.show()
+        plt.close()
 
         control_result2_rsquared_adj.append(result2.rsquared_adj)
         control_result1_rsquared_adj.append(result1.rsquared_adj)

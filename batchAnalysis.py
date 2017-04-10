@@ -33,16 +33,16 @@ for file in filelist:
                             sqrList.append(numSquares)
                             for coord in coords_C: 
                                 if feature in coords_C[coord].feature:
-                                    control_observed.update({coord: 1e3*coords_C[coord].average_feature[feature]})
-                                    control_expected.update({coord: 1e3*coords_C[coord].expected_feature[feature]})
+                                    control_observed.update({coord: coords_C[coord].average_feature[feature]})
+                                    control_expected.update({coord: coords_C[coord].expected_feature[feature]})
                         elif type == "GABAzine":
                             slopeList.append(nSquareData.regression_coefficients[feature]['slope'])
                             sqrList.append(numSquares)
                             coords_I = nSquareData.coordwise
                             for coord in coords_I: 
                                 if feature in coords_I[coord].feature:
-                                    gabazine_observed.update({coord:1e3*coords_I[coord].average_feature[feature]})
-                                    gabazine_expected.update({coord:1e3*coords_I[coord].expected_feature[feature]})
+                                    gabazine_observed.update({coord:coords_I[coord].average_feature[feature]})
+                                    gabazine_expected.update({coord:coords_I[coord].expected_feature[feature]})
 
             print "Read {} into variables".format(file)
             list_control_observed   = []  

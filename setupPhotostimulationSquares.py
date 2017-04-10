@@ -225,6 +225,7 @@ def createCoordinatesFromOneSquareData(inputDir, plotResponse=False):
     threshold_voltage = 5e-4
     numCoords = 24
     squares = [2,3,5,7,9]
+    squares = [9]
     for square in squares:
         coord_list, threshold_voltage = sampleCoordinates(vmax_dict, numCoords, square, threshold_voltage = threshold_voltage)
         circularRandomStimulationGrid = createRandomPhotoStimulation(numSquareRepeats*len(coord_list), coord_list)

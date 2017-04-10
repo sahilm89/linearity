@@ -23,7 +23,7 @@ interestWindowWidth = int(interest/samplingTime)
 ## Filtering
 smootheningTime = 0.5 # In ms
 filter={0:'',1:'ifft_bandpass',2:'bessel'}
-filtering=filter[0]
+filtering=filter[2]
 
 ## Controls
 randomize_N_square_trials = False

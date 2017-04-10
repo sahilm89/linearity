@@ -1,5 +1,6 @@
 import numpy as np
 import scipy.stats as ss
+from scipy import signal
 import itertools as it
 import pickle   # Used to save complete Neuron objects
 from collections import OrderedDict as ordered
@@ -9,7 +10,7 @@ import os
 class Neuron:
     ''' This is Experiment class for the photostimulation experiment '''
 
-    def __init__(self, index, date):
+    def __init__(self, index='', date='', save_trial=False):
         self.index = index
         self.date = date
         self.experiment = {}
@@ -18,10 +19,13 @@ class Neuron:
                             5: 'epsp_min', 6: 'epsp_onset'}
         self.flagsList = ["AP_flag", "noise_flag", "baseline_flag",
                           "photodiode_flag"]
+        self.save_trial = save_trial
 
     def analyzeExperiment(self, type, squares, voltage, photodiode, coords,
                           marginOfBaseLine, marginOfInterest,
-                          F_sample, smootheningTime):
+                          F_sample, smootheningTime, filtering='', removeAP=True):
+        self.removeAP = removeAP
+        self.filtering = filtering
         if type not in self.experiment:
             self.experiment[type] = {squares: Experiment(self, type, squares,
                                      voltage, photodiode, coords,
@@ -45,6 +49,15 @@ class Neuron:
             os.makedirs(directory)
         with open(filename, 'wb') as output:
             pickle.dump(self, output, pickle.HIGHEST_PROTOCOL)
+
+    @staticmethod
+    def load(filename):
+        directory = os.path.dirname(filename)
+        try:
+            with open(filename, 'rb') as input:
+                return pickle.load(input)
+        except IOError:
+            print "{} not found.".format(filename)
 
 class Experiment:
     ''' Change this to key: [coords, photodiode, value]'''
@@ -142,7 +155,7 @@ class Experiment:
             expected = []
             observed = []
             for coord in self.coordwise.keys():
-                if feature in self.coordwise[coord].feature:
+                if feature in list(set(self.coordwise[coord].feature) and set(self.coordwise[coord].expected_feature.keys())):
                     expected.append(self.coordwise[coord].expected_feature[feature])
                     observed.append(self.coordwise[coord].average_feature[feature])
             self.regression_coefficients.update(
@@ -167,8 +180,6 @@ class Trial:
     def __init__(self, experiment, index, coord, photodiode, voltage):
         self.index = index
         self.coord = coord
-        # self.photodiode = photodiode
-        # self.voltage = voltage
         self.experiment = experiment
         self.neuron = self.experiment.neuron
         self.F_sample = self.experiment.F_sample
@@ -177,18 +188,29 @@ class Trial:
         self.feature = {}
         self.linearly_transformed_feature = {}
         self.flags = {}
+        v_conversion = 1e3 # Converting to millivolts
+        if self.neuron.save_trial:
+            self.photodiode = photodiode
+            self.voltage = voltage
 
-        self.interestWindow_raw = voltage[self.experiment.marginOfInterest[0]:self.experiment.marginOfInterest[1]]
-        self.baselineWindow = voltage[self.experiment.marginOfBaseline[0]:self.experiment.marginOfBaseline[1]]
+
+        self.interestWindow_raw = v_conversion * voltage[self.experiment.marginOfInterest[0]:self.experiment.marginOfInterest[1]]
+        self.baselineWindow = v_conversion * voltage[self.experiment.marginOfBaseline[0]:self.experiment.marginOfBaseline[1]]
         self.interestWindow, self.baseline = self._normalizeToBaseline(self.interestWindow_raw, self.baselineWindow)
         self.setupFlags()
-        self._smoothen(self.smootheningTime, self.F_sample)
-        print self.index, self.coord
+        self._filter(self.experiment.neuron.filtering)
+        #self._smoothen(self.smootheningTime, self.F_sample)
 
         # All features here, move some features out of this for APs
-        if not (self.AP_flag or self.baseline_flag or self.photodiode_flag):
-            for featureIndex in xrange(len(self.neuron.features)):
-                self.feature.update({featureIndex: self.extractFeature(featureIndex)})
+        if self.neuron.removeAP:
+            if not (self.AP_flag or self.baseline_flag or self.photodiode_flag): 
+                for featureIndex in xrange(len(self.neuron.features)):
+                    self.feature.update({featureIndex: self.extractFeature(featureIndex)})
+        else:
+            if not (self.baseline_flag or self.photodiode_flag):
+                for featureIndex in xrange(len(self.neuron.features)):
+                    self.feature.update({featureIndex: self.extractFeature(featureIndex)})
+
         # print self.index, self.feature[0]
 
     def setupFlags(self):
@@ -268,7 +290,7 @@ class Trial:
         return float(index_left)/samplingFreq
 
     # Flags
-    def _flagActionPotentials(self, AP_threshold=3e-2):
+    def _flagActionPotentials(self, AP_threshold=30):
         ''' This function flags if there is an AP trialwise and returns a dict of bools '''
         if np.max(self.interestWindow) > AP_threshold:
             print "Action Potential in trial {}".format(self.index)
@@ -304,6 +326,13 @@ class Trial:
         baseline = np.average(baselineWindow)
         interestWindow_new = interestWindow - baseline  # Subtracting baseline from whole array
         return interestWindow_new, baseline
+
+    def _filter(self, filter='', cutoff=2000., order=4):
+        ''' Filter the time series vector '''
+        if filter == 'bessel':
+            cutoff_to_niquist_ratio = 2*cutoff/(self.F_sample) # F_sample/2 is Niquist, cutoff is the low pass cutoff.
+            b, a = signal.bessel(order, cutoff_to_niquist_ratio, analog=False)
+            self.interestWindow = signal.filtfilt(b, a, self.interestWindow)
 
     def _smoothen(self, smootheningTime, samplingFreq):
         '''normalizes the vector to an average baseline'''

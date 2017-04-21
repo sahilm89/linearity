@@ -8,11 +8,14 @@
 5. Baseline flag? 
 
 
-
-
-
 ##
 Color the onset time, and g_max for the gabzine fits, and draw the two PSPs for the control case to see the different variables along with the actual control data.
 
 ## Model sensitivity to each parameter.
 
+#
+1. Phase plot using a model.
+2. Remove the low IQR data and see the log/lin fits.
+3. Check out other papers with divisive normalization and how they fit their DN model.
+4. Correlation between E and I in other ways.
+5. Noise correlations and Vm fluctuations.

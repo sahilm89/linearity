@@ -12,7 +12,7 @@ with open(analysisFile, 'rb') as input:
 
 exc = {}
 control = {}
-feature = 0
+feature = 1
 for type in neuron.experiment.keys():
     #for feature in neuron.features:
         for squares in neuron.experiment[type].keys(): 
@@ -61,7 +61,6 @@ for type in neuron.experiment.keys():
 
     color=iter(plt.cm.viridis(np.linspace(0,1,len(neuron.experiment[type]))))
     ax = plt.subplot(111)
-    feature = 0
     for numSquares in neuron.experiment[type].keys(): 
     #for numSquares in [2]: 
         if not numSquares == 1:
@@ -87,7 +86,6 @@ for type in neuron.experiment.keys():
 
     color=iter(plt.cm.viridis(np.linspace(0,1,len(neuron.experiment[type]))))
     ax = plt.subplot(111)
-    feature = 0
     for numSquares in neuron.experiment[type].keys(): 
         if not numSquares == 1:
             c =next(color)
@@ -116,14 +114,9 @@ for type in neuron.experiment.keys():
     plt.savefig("{}/{}_scatter_raw".format(plotPath, type)) 
     plt.close()
 
-
-
-
-
 for type in neuron.experiment.keys():
     color=iter(plt.cm.viridis(np.linspace(0,1,len(neuron.experiment[type]))))
     ax = plt.subplot(111)
-    feature = 0
     for numSquares in neuron.experiment[type].keys(): 
         if not numSquares == 1:
             c =next(color)

@@ -89,8 +89,9 @@ for i, file in enumerate(filelist):
                     list_control_expected.append(element2)
 
     ###########################
-            
-    if len(list_control_expected)>30 and len(list_control_observed)>30:
+    minPoints = 50
+    minIQR = 3
+    if len(list_control_expected)>minPoints and len(list_control_observed)> minPoints and ss.iqr(list_control_expected)>minIQR:
         X = np.array(list_control_expected)
         y = np.array(list_control_observed)
         idx   = np.argsort(X)
@@ -132,7 +133,7 @@ for i, file in enumerate(filelist):
         control_result1_rsquared_adj.append(result1.rsquared_adj)
         control_var_expected.append(np.var(list_control_expected))
 
-    if len(list_gabazine_expected)>30 and len(list_gabazine_observed)>30:
+    if len(list_gabazine_expected)>minPoints and len(list_gabazine_observed)>minPoints and ss.iqr(list_gabazine_expected)>minIQR :
         X = np.array(list_gabazine_expected)
         y = np.array(list_gabazine_observed)
         X_log = np.log10(list_gabazine_expected)

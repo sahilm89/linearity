@@ -91,21 +91,23 @@ def setup(inputDir, index, date, save_trial=False):
         coords = [(i, j) for i, j in zip(coords[0], coords[1])]
     
         CPP = experimentDir + 'CPP' + str(squares) + '.mat'
-        fullDict = readMatlabFile(CPP)
-        currentType, photoDiode = parseDictKeys(fullDict)
+        if os.path.exists(CPP):
+            fullDict = readMatlabFile(CPP)
+            currentType, photoDiode = parseDictKeys(fullDict)
     
-        if not squares:
-            numSquares = 1  # Prefix for CPP1
+            if not squares:
+                numSquares = 1  # Prefix for CPP1
+            else:
+                numSquares = squares
+    
+            print numSquares, currentType.keys()
+            for type in currentType:
+                marginOfBaseLine, marginOfInterest = find_BaseLine_and_WindowOfInterest_Margins(photoDiode[type], threshold,
+                                baselineWindowWidth, interestWindowWidth)
+                analyzeExperiment(neuron, type, numSquares, currentType[type], photoDiode[type], coords, marginOfBaseLine, marginOfInterest,
+                        F_sample, smootheningTime, filtering = 'bessel')
         else:
-            numSquares = squares
-    
-        print numSquares, currentType.keys()
-        for type in currentType:
-            marginOfBaseLine, marginOfInterest = find_BaseLine_and_WindowOfInterest_Margins(photoDiode[type], threshold,
-                            baselineWindowWidth, interestWindowWidth)
-    
-            analyzeExperiment(neuron, type, numSquares, currentType[type], photoDiode[type], coords, marginOfBaseLine, marginOfInterest,
-                    F_sample, smootheningTime, filtering = 'bessel')
+            print "File not found!" 
 
     return neuron
 

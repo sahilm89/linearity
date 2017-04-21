@@ -51,7 +51,8 @@ for type in ['Control', 'GABAzine']:
         randX = experimentDir + 'coords/CPP' + str(squares) + '_randX.txt'
         randY = experimentDir + 'coords/CPP' + str(squares) + '_randY.txt'
 
-        coords = readBoxCSV(randX, randY, length=squares*numCoords)
+        #coords = readBoxCSV(randX, randY, length=squares*numCoords) # Why was this here?
+        coords = readBoxCSV(randX, randY)
         # print [coord for coord in zip(coords[0], coords[1])]
         assert len(coords[0]) == len(coords[1]), "{},{}".format(len(coords[0]), len(coords[1]))
         coords = [(i, j) for i, j in zip(coords[0], coords[1])]

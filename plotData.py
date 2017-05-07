@@ -12,13 +12,13 @@ with open(analysisFile, 'rb') as input:
 
 exc = {}
 control = {}
-feature = 1
+feature = 0
 for type in neuron.experiment.keys():
     #for feature in neuron.features:
         for squares in neuron.experiment[type].keys(): 
             for index in neuron.experiment[type][squares].coordwise:
                 if feature in neuron.experiment[type][squares].coordwise[index].feature:
-                    print len(index), index
+                    print index, [trial.index for trial in neuron.experiment[type][squares].coordwise[index].trials]
                     if type == "Control":
                         control.update({index :neuron.experiment[type][squares].coordwise[index].average_feature[feature]})
                     elif type=="GABAzine":
@@ -76,6 +76,8 @@ for type in neuron.experiment.keys():
             slope, intercept  = neuron.experiment[type][numSquares].regression_coefficients[feature]['slope'], neuron.experiment[type][numSquares].regression_coefficients[feature]['intercept']
             ynew = slope*E + intercept
             ax.plot(E, ynew, c=c, label='{},m= {:.2f}'.format(numSquares, slope))
+    axisWidth = (min(min(E), min(O)), max(max(E), max(O)))
+    ax.plot(axisWidth, axisWidth, 'r--')
     plt.legend()
     plt.xlabel('Expected (mV)')
     plt.ylabel('Observed (mV)')
@@ -87,17 +89,17 @@ for type in neuron.experiment.keys():
     color=iter(plt.cm.viridis(np.linspace(0,1,len(neuron.experiment[type]))))
     ax = plt.subplot(111)
     for numSquares in neuron.experiment[type].keys(): 
-        if not numSquares == 1:
+        if not numSquares == 1 and not numSquares > 2:
             c =next(color)
             trials = []
             expected, observed = [], []
             for coord in neuron.experiment[type][numSquares].coordwise.keys():
-                print coord, len(neuron.experiment[type][numSquares].coordwise[coord].trials)
+                print "Coord: {}, expected: {}".format(coord, neuron.experiment[type][numSquares].coordwise[coord].expected_feature[feature])
                 for trial in neuron.experiment[type][numSquares].coordwise[coord].trials:
                     trials.append(trial.index)
                     if feature in trial.feature:
                         observed.append(trial.feature[feature])
-                        expected.append(neuron.experiment[type][numSquares].coordwise[coord].expected_feature[feature])
+                        expected.append(trial.experiment.coordwise[coord].expected_feature[feature])
             E = np.array(expected)
             O = np.array(observed)
             ax.scatter(E,O, c = c)
@@ -109,6 +111,9 @@ for type in neuron.experiment.keys():
     plt.legend()
     plt.xlabel('Expected (mV)')
     plt.ylabel('Observed (mV)')
+    axisWidth = (min(min(E), min(O)), max(max(E), max(O)))
+    ax.plot(axisWidth, axisWidth, 'r--')
+
     plt.title(str(type) + " " + neuron.features[feature])
     #plt.show()
     plt.savefig("{}/{}_scatter_raw".format(plotPath, type)) 
@@ -134,6 +139,8 @@ for type in neuron.experiment.keys():
 plt.legend()
 plt.xlabel('Expected (mV)')
 plt.ylabel('Observed (mV)')
+axisWidth = (min(min(E), min(O)), max(max(E), max(O)))
+ax.plot(axisWidth, axisWidth, 'r--')
 plt.title(neuron.features[feature])
 plt.savefig("{}/{}_scatter_averaged_both".format(plotPath, type)) 
 #plt.show()

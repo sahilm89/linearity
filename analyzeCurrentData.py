@@ -79,14 +79,16 @@ def setup(inputDir, index, date, save_trial=False):
     
     coords = readBoxCSV(randX, randY)
     repeatSize = len(coords[0])
-    
+
+    randX = experimentDir + 'coords/randX.txt'
+    randY = experimentDir + 'coords/randY.txt'
+
     for squares in gridSizeList:
         if not (os.path.exists(experimentDir + 'coords/CPP' + str(squares) + '_randX.txt') or os.path.exists(experimentDir + 'coords/CPP' + str(squares) + '_randY.txt')):
                 createCoords(randX, randY, repeatSize, squares, experimentDir)
-    
-        randX = experimentDir + 'coords/CPP' + str(squares) + '_randX.txt'
-        randY = experimentDir + 'coords/CPP' + str(squares) + '_randY.txt'
-        coords = readBoxCSV(randX, randY)
+        sqr_randX = experimentDir + 'coords/CPP' + str(squares) + '_randX.txt'
+        sqr_randY = experimentDir + 'coords/CPP' + str(squares) + '_randY.txt'
+        coords = readBoxCSV(sqr_randX, sqr_randY)
         assert len(coords[0]) == len(coords[1]), "{},{}".format(len(coords[0]), len(coords[1]))
         coords = [(i, j) for i, j in zip(coords[0], coords[1])]
     
@@ -132,7 +134,7 @@ for type in neuron.experiment.keys():
         print type
         if type == 1:
             for coord in currentVals.coordwise:
-                excit.append(abs(currentVals.coordwise[coord].average_feature[5]))
+                excit.append(abs(currentVals.coordwise[coord].average_feature[0]))
                 onset_e.append(currentVals.coordwise[coord].average_feature[6])
         elif type == 2:
             for coord in currentVals.coordwise:
@@ -146,19 +148,21 @@ print onset_i, onset_e
 delay,excitation = [], []
 for eon, ion, e in zip(onset_e, onset_i, excit):
     #if not (eon == 0. or ion == 0.): 
-        delay.append(eon - ion)
+        delay.append(ion - eon)
         excitation.append(e)
 print delay
 
-plt.scatter(excit, inhib)
-plt.xlim((0,0.5))
-plt.ylim((0,0.5))
-plt.show()
-
-print excitation, delay
-plt.scatter(excitation, delay)
-plt.show()
-
+#plt.scatter(excit, inhib)
+#plt.xlim((0,0.5))
+#plt.ylim((0,0.5))
+#plt.show()
+#
+#print excitation, delay
+#plt.scatter(excitation, delay)
+#plt.xlabel("Excitation")
+#plt.ylabel("Delay")
+#plt.show()
+#
 #if not os.path.exists(inputDir + '/plots/'):
 #    os.makedirs(inputDir + '/plots/')
 #neuron.save(inputDir + '/plots/' + index + '.pkl')

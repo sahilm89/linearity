@@ -942,9 +942,11 @@ def createCoords(randX_file, randY_file, repeatSize, SizeOfPhotoactiveGrid, inpu
     ''' Creates photostimulation coords for the CPP dateset from the randcoords '''
 
     if not (os.path.isfile(inputDir + 'coords/CPP' + str(SizeOfPhotoactiveGrid) + '_randX.txt') or os.path.isfile(inputDir + 'coords/CPP' + str(SizeOfPhotoactiveGrid) + '_randY.txt')):
+
         randX = np.loadtxt(randX_file,delimiter=',')
         randY = np.loadtxt(randY_file,delimiter=',')
 
+        print "Creating coords using {} and {}".format(randX_file, randY_file)
         print "Repeat is", repeatSize, SizeOfPhotoactiveGrid
 
         randX_sizeBased = randX[:(repeatSize*SizeOfPhotoactiveGrid)]

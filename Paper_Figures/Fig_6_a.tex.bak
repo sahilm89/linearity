@@ -1,0 +1,31 @@
+\documentclass[tikz]{standalone}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage[betterproportions]{circuitikz}
+\begin{document}
+\begin{circuitikz} [scale =1.25, transform shape]
+\draw
+(-1,0) -- (0,0)
+(-1,4) -- (0,4)
+(0,0) to[C, l=$C_{m}$] (0,4) -- (2,4)
+	to[R, l=$g_{leak}$] (2,1)
+	to[battery1, l=$E_{leak}$] (2,0.5) -- (2,0) -- (0,0)
+(3,4) node[]{} to (3,4.25) node[label={above:$V_m$},*-o]{}
+(2,4) to (4,4)
+	to[vR, l=$g_{exc}$] (4,1)
+	(4,0.5) to[battery1, l_=$E_{exc}$] (4,1) 
+	-- (4,0) -- (2,0)
+(3,0) to (3,0) node[ground] {}
+(4,4) to (6,4)
+	to[vR, l=$g_{inh}$] (6,1)
+	to[battery1, l=$E_{inh}$] (6,0.5) -- (6,0) -- (4,0)
+(6,0) -- (7,0)
+(6,4) -- (7,4)
+;
+\par
+2 \ctikzset{bipoles/vresistor/height=.6}
+\end{circuitikz}
+
+$$ C_m \frac{dV_m}{dt} = g_{leak}(V_m - E_{leak}) + g_{exc}(V_m - E_{exc}) + g_{inh}(V_m - E_{exc})$$
+
+\end{document}

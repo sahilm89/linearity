@@ -50,6 +50,9 @@ class Neuron:
         with open(filename, 'wb') as output:
             pickle.dump(self, output, pickle.HIGHEST_PROTOCOL)
 
+    def __iter__(self):
+	return self.experiment.iteritems()
+
     @staticmethod
     def load(filename):
         directory = os.path.dirname(filename)
@@ -275,19 +278,119 @@ class Trial:
         auctp = np.trapz(windowToPeak, dx=self.samplingTime)  # in V.s
         return auctp
 
-    def _findOnsetTime(self, samplingFreq, steps=50, pValTolerance=0.01):
-        ''' Find the onset of the curve using a 2 sample KS test '''
-        # print "_findOnset doesn't work yet!"
-        window_size = len(self.interestWindow_raw)
-        step_size = window_size/steps
-        index_right = step_size
-        for index_left in xrange(0, window_size, step_size):
+    def _findOnsetTime(self, samplingFreq, step=2., slide = 0.05, maxOnset = 50., initpValTolerance=0.5):
+        ''' Find the onset of the curve using a 2 sample KS test 
+	maxOnset, step and slide are in ms'''
+
+        window_size = int(step*1e-3*samplingFreq)
+        step_size = int(slide*1e-3*samplingFreq)
+        index_right = window_size
+        for index_left in xrange(0, len(self.interestWindow_raw)+1-window_size, step_size):
             stat, pVal = ss.ks_2samp(self.baselineWindow, self.interestWindow_raw[index_left:index_right])
             index_right += step_size
-            if pVal < pValTolerance:
+            if pVal < initpValTolerance:
                 # print index_left, pVal, stat#, self.interestWindow_raw[index_left:index_right]
                 break
         return float(index_left)/samplingFreq
+
+        # Current stuff, let's move it out of this place to another file.
+
+        #maxIndex = int(samplingFreq*maxOnset*1e-3)
+        #if self.experiment.type == 1:
+        #    maxOnsetIndex = np.argmax(-self.interestWindow[:maxIndex])
+        #elif self.experiment.type == 2:
+        #    maxOnsetIndex = np.argmax(self.interestWindow[:maxIndex])
+        #else:
+        #    maxOnsetIndex = np.argmax(self.interestWindow[:maxIndex])
+
+	##maxOnsetIndex = np.argmax(abs(self.interestWindow))
+        #minOnsetTime = 2 #ms
+
+        #window_size = len(self.interestWindow)
+        #step_size = int(samplingFreq*step*1e-3)
+
+        #overlap =  int(samplingFreq*0.05*1e-3)
+
+        #index_right = maxOnsetIndex
+        #index_left = index_right - step_size
+        #minOnset = int(samplingFreq*minOnsetTime*1e-3)
+
+        #baseMean = np.mean(self.interestWindow[:minOnset])
+        #factor = 5 
+        #thresholdGradient = 0.01
+        #pValTolerance = initpValTolerance
+
+        ##if -baseMean*factor < self.interestWindow[maxOnsetIndex] < baseMean*factor:
+        ##    return 0
+        ##print baseMean
+        #l_window = self.interestWindow[:minOnset]
+        #while (index_left>minOnset):
+        #    r_window = self.interestWindow[index_left:index_right] #, self.baselineWindow #self.interestWindow[index_left - step_size:index_left]
+
+        #    #if baseMean - 0.1 < np.mean(r_window) < baseMean + 0.1:
+        #    #if (-factor*baseMean  < np.mean(r_window) < factor*baseMean) and (np.average(np.abs(np.gradient(r_window))) < thresholdGradient):
+
+        #    stat, pVal = ss.ks_2samp(r_window, l_window)
+        #    if pVal>pValTolerance:
+        #        #print pVal, pValTolerance,float(index_right)/samplingFreq
+        #        if (self.experiment.type == 1):# and np.mean(self.interestWindow[index_left:index_right]) >= baseMean) :
+        #            #return float(index_right + np.argmax(self.interestWindow[index_right:maxOnsetIndex]))/samplingFreq
+        #            smoothing = []
+        #            #for index in range(index_right, maxOnsetIndex-step_size+1):
+        #            #    smoothing.append(np.average(self.interestWindow[index: index+step_size]))
+        #            if len(smoothing)>2:
+        #                return float(index_right + np.argmax(smoothing) + int(step_size/2))/samplingFreq
+        #            else:
+        #                return float(index_right)/samplingFreq
+        #            #return float(index_right + np.argmax(np.abs(np.gradient(self.interestWindow[index_right:maxOnsetIndex]))))/samplingFreq
+        #            #        return float(index) /samplingFreq
+        #        elif (self.experiment.type == 2):# and np.mean(self.interestWindow[index_left:index_right]) <= baseMean):
+        #            #return float(index_right + np.argmin(self.interestWindow[index_right:maxOnsetIndex]))/samplingFreq
+        #            #return float(index_right + np.argmax(np.abs(np.gradient(self.interestWindow[index_right:maxOnsetIndex]))))/samplingFreq
+        #            smoothing = []
+        #            #for index in range(index_right, maxOnsetIndex-step_size+1):
+        #            #    smoothing.append(np.average(self.interestWindow[index: index+step_size]))
+        #            if len(smoothing)>2:
+        #                return float(index_right + np.argmin(smoothing)+ int(step_size/2))/samplingFreq
+        #                #return float(index_right + step_size*np.argmax(np.abs(np.gradient(smoothing))))/samplingFreq
+        #            else:
+        #                return float(index_right)/samplingFreq
+
+        #            #return float(index_right + step_size*np.argmax(np.abs(np.gradient(smoothing))))/samplingFreq
+        #            #    if (np.average(self.interestWindow[index: index+step_size]))> 5*baseMean:
+        #            #        return float(index) /samplingFreq
+        #            #return float(index_right + np.argmax((self.interestWindow[index_right:]>baseMean)) ) /samplingFreq
+        #        else:
+        #            return float(index_right)/samplingFreq
+        #        #return float(index_left+(step_size/2))/samplingFreq
+        #    else:
+        #        index_left-=overlap
+        #        index_right-=overlap
+        #        if index_left<=minOnset:
+        #            pValTolerance/=2
+        #            #factor*=2
+        #            #thresholdGradient*=2
+        #            if pValTolerance<0.01:
+        #                print "{} pval too low for {} tolerance, increasing baseline size".format(pVal, pValTolerance)
+        #                minOnset*=2
+        #                #step_size*=2
+        #                index_right = maxOnsetIndex
+        #                index_left = maxOnsetIndex - step_size
+
+        #                l_window = self.interestWindow[:minOnset]
+        #                pValTolerance = initpValTolerance 
+
+        #                if minOnset > maxOnsetIndex - step_size :
+        #                    print "Returning Nan"
+        #                    return np.nan
+        #            else:
+        #                index_right = maxOnsetIndex
+        #                index_left = maxOnsetIndex - step_size
+
+
+        #            #if factor>100:
+        #            #    return 0
+
 
     # Flags
     def _flagActionPotentials(self, AP_threshold=30):
@@ -334,9 +437,9 @@ class Trial:
             b, a = signal.bessel(order, cutoff_to_niquist_ratio, analog=False)
             self.interestWindow = signal.filtfilt(b, a, self.interestWindow)
 
-    def _smoothen(self, smootheningTime, samplingFreq):
+    def _smoothen(self, smootheningTime):
         '''normalizes the vector to an average baseline'''
-        smootheningWindow = smootheningTime*1e-3*samplingFreq
+        smootheningWindow = smootheningTime*1e-3*self.F_sample
         window = np.ones(int(smootheningWindow)) / float(smootheningWindow)
         self.interestWindow = np.convolve(self.interestWindow, window, 'same')  # Convolving with a rectangle
 
@@ -376,11 +479,15 @@ class Coordinate:
     def _findAveraged(self):
         ''' Finds the average feature for the coord '''
         for feature in self.neuron.features:
-            averageFeature = np.average([trial.feature[feature]
-                                         for trial in self.trials
-                                         if feature in trial.feature])
-            if not np.isnan(averageFeature):
-                self.average_feature.update({feature: averageFeature})
+            trialSet = []
+            for trial in self.trials:
+                if (feature in trial.feature):
+                    if trial.feature[feature]:
+                        if not np.isnan(trial.feature[feature]) and not trial.noise_flag:
+                            trialSet.append(trial.feature[feature])
+            averageFeature = np.average(trialSet)
+            #if not np.isnan(averageFeature):
+            self.average_feature.update({feature: averageFeature})
 
     def _setFeatures(self):
         ''' Sets valid features for the coordinate based on flags '''

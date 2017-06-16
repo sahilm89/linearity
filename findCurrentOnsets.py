@@ -3,6 +3,7 @@ from Linearity import Neuron
 import sys
 import numpy as np
 import scipy.stats as ss
+import matplotlib.pyplot as plt
 n = Neuron.load(sys.argv[1])
 
 def findOnsetTime(trial, step=2., slide = 0.05, minOnset = 2., maxOnset = 50., initpValTolerance=0.5):
@@ -95,10 +96,24 @@ def findOnsetTime(trial, step=2., slide = 0.05, minOnset = 2., maxOnset = 50., i
                     index_right = maxOnsetIndex
                     index_left = maxOnsetIndex - step_size
 
+avg_exc_onset = {}
+avg_inh_onset = {}
+avg_exc_max = {}
+
 for expType, exp in n:
     for sqr in exp:
         for coord in exp[sqr].coordwise:
-            if expType == '1':
-                avg_exc_onset[coord] = np.average([findOnsetTime(trial) for trial in exp[sqr].coordwise[coord]])
-            if expType == '2':
-                avg_inh_onset[coord] = np.average([findOnsetTime(trial) for trial in exp[sqr].coordwise[coord]])
+            if expType == 1:
+                avg_exc_onset[coord] = np.nanmean([findOnsetTime(trial) for trial in exp[sqr].coordwise[coord].trials])
+                avg_exc_max[coord] = -exp[sqr].coordwise[coord].average_feature[5]
+            if expType == 2:
+                avg_inh_onset[coord] = np.nanmean([findOnsetTime(trial) for trial in exp[sqr].coordwise[coord].trials])
+print (avg_exc_max, avg_exc_onset, avg_inh_onset)
+delay, max = [], []
+for coord in set(avg_exc_onset).intersection(set(avg_inh_onset)):
+    delay.append(avg_inh_onset[coord]- avg_exc_onset[coord])
+    max.append(avg_exc_max[coord])
+
+fig, ax = plt.subplots()
+ax.scatter(max, delay)
+plt.show()

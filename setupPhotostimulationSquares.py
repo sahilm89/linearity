@@ -93,14 +93,14 @@ def createPhotoStimulation_init(outDirectory):
     for k in range(len(y)):
         jointY.append(y[k*len(circularGrid):(k+1)*len(circularGrid)])
     
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    ax.scatter(x,y,c=range(len(x)))
-    ax.set_xlim(0,numEdgeSquares)
-    ax.set_ylim(0,numEdgeSquares)
-    plt.show()
+    #fig = plt.figure()
+    #ax = fig.add_subplot(111)
+    #ax.scatter(x,y,c=range(len(x)))
+    #ax.set_xlim(0,numEdgeSquares)
+    #ax.set_ylim(0,numEdgeSquares)
+    #plt.show()
 
-def sampleCoordinates(oneSquareDictionary, number, square = 1, mode='uniform', threshold_voltage=5e-4, max_voltage=3e-2):
+def sampleCoordinates(oneSquareDictionary, number, square = 1, mode='uniform', threshold_voltage=0.5, max_voltage=30, maxCombinations=1e6): # Units are mV
     ''' Samples coordinates from the dictionary of coordinates and values provided, uniformly or largest'''
 
     if mode == 'uniform':
@@ -108,6 +108,7 @@ def sampleCoordinates(oneSquareDictionary, number, square = 1, mode='uniform', t
         coord_list_pre = []
         coord_values_pre = []
         comb = itertools.combinations(oneSquareDictionary, square)
+        numCombs = 0
         for j in comb:
             sumValue = sum([oneSquareDictionary[k] for k in j])
             if ( sumValue > max_voltage) or (sumValue < threshold_voltage): 
@@ -115,6 +116,9 @@ def sampleCoordinates(oneSquareDictionary, number, square = 1, mode='uniform', t
             else:
                 coord_list_pre.append(j)
                 coord_values_pre.append(sumValue)
+                numCombs+=1
+            if numCombs > maxCombinations:
+                break
 
         coord_values_pre = np.array(coord_values_pre)
         print coord_values_pre
@@ -225,38 +229,31 @@ def createCoordinatesFromOneSquareData(inputDir, plotResponse=False):
     threshold_voltage = 5e-4
     numCoords = 24
     squares = [2,3,5,7,9]
-    squares = [9]
+    print len(vmax_dict)
     for square in squares:
         coord_list, threshold_voltage = sampleCoordinates(vmax_dict, numCoords, square, threshold_voltage = threshold_voltage)
         circularRandomStimulationGrid = createRandomPhotoStimulation(numSquareRepeats*len(coord_list), coord_list)
         x,y = returnCoordsFromGrid(circularRandomStimulationGrid) 
         print len(x), len(y)
 
-        #with open(os.path.join(experimentDir , "coords", "randX.txt"),'w') as coordFile:
-        #    coordFile.write(','.join( [str(i+1) for i in x] ))
-        #
-        #with open(os.path.join(experimentDir , "coords", "randY.txt"),'w') as coordFile:
-        #    coordFile.write(','.join( [str(i+1) for i in y] ))
-        
         with open(os.path.join(experimentDir , "coords", "CPP" + str(square) + "_randX.txt"),'w') as coordFile:
             coordFile.write(','.join( [str(i+1) for i in x] ))
         
         with open(os.path.join(experimentDir , "coords", "CPP" + str(square) + "_randY.txt"),'w') as coordFile:
             coordFile.write(','.join( [str(i+1) for i in y]))
     
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    ax.scatter(x,y,c=range(len(x)))
-    ax.set_xlim(0,numEdgeSquares)
-    ax.set_ylim(0,numEdgeSquares)
-    plt.show()
+    #fig = plt.figure()
+    #ax = fig.add_subplot(111)
+    #ax.scatter(x,y,c=range(len(x)))
+    #ax.set_xlim(0,numEdgeSquares)
+    #ax.set_ylim(0,numEdgeSquares)
+    #plt.show()
 
     if plotResponse:
-
         vmax_dict_new = { key:vmax_dict[key] for key in coord_list}
-        plt.hist(vmax_dict_new.values())
-        plt.xlabel("$V_{max}$")
-        plt.show()
+        #plt.hist(vmax_dict_new.values())
+        #plt.xlabel("$V_{max}$")
+        #plt.show()
 
 class App():
     def __init__(self):

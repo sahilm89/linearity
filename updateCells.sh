@@ -1,5 +1,6 @@
 # Removing already existing files for updating
 rm /media/sahil/NCBS_Shares_BGStim/patch_data/current_clamp_files.txt
+rm /media/sahil/NCBS_Shares_BGStim/patch_data/current_clamp_spikes_files.txt
 rm /media/sahil/NCBS_Shares_BGStim/patch_data/current_clamp_files_with_GABAzine.txt
 rm /media/sahil/NCBS_Shares_BGStim/patch_data/voltage_clamp_files.txt
 rm /media/sahil/NCBS_Shares_BGStim/patch_data/CA3_files.txt
@@ -47,7 +48,7 @@ done
 
 
 ## Checking for CPP with spikes under current clamp cells
-find /media/sahil/NCBS_Shares_BGStim/patch_data/ -mindepth 1 -type d -name 'c?_CS'|while read cell ; do 
+find /media/sahil/NCBS_Shares_BGStim/patch_data/ -mindepth 1 -type d -name 'c?_spikes'|while read cell ; do 
 if [ -d "$cell/CPP/" ]; then
    echo $cell
   echo "$cell/">>/media/sahil/NCBS_Shares_BGStim/patch_data/current_clamp_spikes_files.txt

@@ -70,20 +70,33 @@ for type in ['Control', 'GABAzine']:
         voltageTrace, photoDiode = parseDictKeys(fullDict)
         marginOfBaseLine, marginOfInterest = find_BaseLine_and_WindowOfInterest_Margins(photoDiode, threshold,
                 baselineWindowWidth, interestWindowWidth)
-        if any(x in experimentDir.split('/')[-2] for x in ['CS', 'spikes']):
+        print (inputDir.split('/')[-1])
+        if any(x in inputDir.split('/')[-1] for x in ['CS', 'spikes']):
             neuron.analyzeExperiment(type, numSquares, voltageTrace, photoDiode, coords, marginOfBaseLine, marginOfInterest,
-                                 F_sample, smootheningTime)
+                                 F_sample, smootheningTime, removeAP=False)
         else:
             neuron.analyzeExperiment(type, numSquares, voltageTrace, photoDiode, coords, marginOfBaseLine, marginOfInterest,
                                  F_sample, smootheningTime, removeAP=True, filtering=filtering)
 
-        # trials = neuron.experiment[type][numSquares].trial
-        # for trial in trials.values():
-        #     plt.plot(trial.interestWindow)
-        #     plt.vlines(trial.F_sample * trial.feature[6], min(trial.interestWindow),max(trial.interestWindow))
-        #     plt.show()
-
 if not os.path.exists(inputDir + '/plots/'):
     os.makedirs(inputDir + '/plots/')
+
+fig, ax = plt.subplots()
+for expType, exp in neuron:
+    if expType == "Control":
+        for sqr in exp:
+            if sqr>1:
+                list_exp, list_obs = [], []
+                for trial in exp[sqr].trial:
+                    if (0 in exp[sqr].trial[trial].expected_feature) and (0 in exp[sqr].trial[trial].feature):
+                        list_exp.append(exp[sqr].trial[trial].expected_feature[0])
+                        list_obs.append(exp[sqr].trial[trial].feature[0])
+                ax.scatter(list_exp, list_obs)
+xlim = ax.get_xlim()
+xlim = (0,xlim[1])
+ax.set_xlim(xlim)
+ax.set_ylim(xlim)
+plt.savefig(inputDir + '/plots/' + 'E_O.png')
+
 neuron.save(inputDir + '/plots/' + index + '.pkl')
 print "Wrote {}".format(inputDir + '/plots/' + index + '.pkl')

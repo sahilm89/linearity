@@ -189,6 +189,7 @@ class Trial:
         self.samplingTime = self.experiment.samplingTime
         self.smootheningTime = self.experiment.smootheningTime
         self.feature = {}
+        self.expected_feature = {}
         self.linearly_transformed_feature = {}
         self.flags = {}
         v_conversion = 1e3 # Converting to millivolts
@@ -363,6 +364,7 @@ class Coordinate:
 
         if not self.numSquares == 1:
             self._findExpected()
+        self._flagCoordinate()
 
     def _flagCoordinate(self):
         ''' Flags the coordinate for all flags '''
@@ -409,6 +411,8 @@ class Coordinate:
                             break
                 if sum_of_features is not None:
                     self.expected_feature.update({feature: sum_of_features})
+                    for trial in self.trials:
+                        trial.expected_feature.update({feature: sum_of_features})
 
     def _linearTransform(self, value, minValue, maxValue):
         return (value - minValue)/(maxValue - minValue)

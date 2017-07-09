@@ -152,17 +152,21 @@ for eon, ion, e in zip(onset_e, onset_i, excit):
         excitation.append(e)
 print delay
 
-#plt.scatter(excit, inhib)
-#plt.xlim((0,0.5))
-#plt.ylim((0,0.5))
-#plt.show()
-#
+fig,ax = plt.subplots()
+ax.scatter(excit, inhib)
+ylim=ax.get_ylim()
+xlim= (0, ylim[1])
+ylim= (0, ylim[1])
+ax.set_xlim(xlim)
+ax.set_ylim(ylim)
+plt.savefig(inputDir + '/plots/' + 'EI.png')
+
 #print excitation, delay
 #plt.scatter(excitation, delay)
 #plt.xlabel("Excitation")
 #plt.ylabel("Delay")
 #plt.show()
 #
-#if not os.path.exists(inputDir + '/plots/'):
-#    os.makedirs(inputDir + '/plots/')
-#neuron.save(inputDir + '/plots/' + index + '.pkl')
+if not os.path.exists(inputDir + '/plots/'):
+    os.makedirs(inputDir + '/plots/')
+neuron.save(inputDir + '/plots/' + index + '.pkl')

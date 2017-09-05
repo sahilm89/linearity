@@ -2,6 +2,7 @@
 rm /media/sahil/NCBS_Shares_BGStim/patch_data/current_clamp_files.txt
 rm /media/sahil/NCBS_Shares_BGStim/patch_data/current_clamp_spikes_files.txt
 rm /media/sahil/NCBS_Shares_BGStim/patch_data/current_clamp_files_with_GABAzine.txt
+rm /media/sahil/NCBS_Shares_BGStim/patch_data/current_clamp_with_CS.txt
 rm /media/sahil/NCBS_Shares_BGStim/patch_data/voltage_clamp_files.txt
 rm /media/sahil/NCBS_Shares_BGStim/patch_data/CA3_files.txt
 rm /media/sahil/NCBS_Shares_BGStim/patch_data/IN_voltage_clamp_files.txt
@@ -19,6 +20,15 @@ find /media/sahil/NCBS_Shares_BGStim/patch_data/ -mindepth 1 -type d -name 'c?_C
 if [ -d "$cell/CPP/" ]; then
    echo $cell
   echo "$cell/">>/media/sahil/NCBS_Shares_BGStim/patch_data/current_clamp_files.txt
+fi
+done
+
+## Checking for CPP under cut slices current clamp cells
+
+find /media/sahil/NCBS_Shares_BGStim/patch_data/ -mindepth 1 -type d -name 'c?_CS'|while read cell ; do 
+if [ -d "$cell/CPP/" ]; then
+   echo $cell
+  echo "$cell/">>/media/sahil/NCBS_Shares_BGStim/patch_data/current_clamp_with_CS.txt
 fi
 done
 

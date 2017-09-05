@@ -27,7 +27,7 @@ z
 " style="fill:none;"/>
    </g>
    <g id="line2d_1">
-    <path clip-path="url(#pec2661c553)" d="M 32.098608 80.252996 
+    <path clip-path="url(#pbc07bd9013)" d="M 32.098608 80.252996 
 L 32.326995 84.260401 
 L 32.403124 84.363556 
 L 32.441188 84.307468 
@@ -538,7 +538,7 @@ L 108.189517 72.617485
 " style="fill:none;stroke:#008080;stroke-linecap:round;stroke-width:0.5;"/>
    </g>
    <g id="line2d_2">
-    <path clip-path="url(#pec2661c553)" d="M 32.098608 70.874469 
+    <path clip-path="url(#pbc07bd9013)" d="M 32.098608 70.874469 
 L 32.326995 72.729551 
 L 32.441188 72.555268 
 L 32.479253 72.624578 
@@ -1068,7 +1068,7 @@ L 108.189517 70.239436
 " style="fill:none;stroke:#008080;stroke-linecap:round;stroke-width:0.5;"/>
    </g>
    <g id="line2d_3">
-    <path clip-path="url(#pec2661c553)" d="M 32.098608 65.846544 
+    <path clip-path="url(#pbc07bd9013)" d="M 32.098608 65.846544 
 L 32.326995 70.764216 
 L 32.441188 69.738342 
 L 32.631511 67.851046 
@@ -1614,12 +1614,12 @@ C -0.670975 -0.389685 -0.75 -0.198902 -0.75 0
 C -0.75 0.198902 -0.670975 0.389685 -0.53033 0.53033 
 C -0.389685 0.670975 -0.198902 0.75 0 0.75 
 z
-" id="mcebc5ba39a" style="stroke:#000000;"/>
+" id="mc8e9798f19" style="stroke:#000000;"/>
     </defs>
-    <g clip-path="url(#pec2661c553)">
-     <use style="stroke:#000000;" x="50.369562" xlink:href="#mcebc5ba39a" y="10.906364"/>
-     <use style="stroke:#000000;" x="51.701819" xlink:href="#mcebc5ba39a" y="10.906364"/>
-     <use style="stroke:#000000;" x="46.905693" xlink:href="#mcebc5ba39a" y="10.906364"/>
+    <g clip-path="url(#pbc07bd9013)">
+     <use style="stroke:#000000;" x="50.369562" xlink:href="#mc8e9798f19" y="10.906364"/>
+     <use style="stroke:#000000;" x="51.701819" xlink:href="#mc8e9798f19" y="10.906364"/>
+     <use style="stroke:#000000;" x="46.905693" xlink:href="#mc8e9798f19" y="10.906364"/>
     </g>
    </g>
    <g id="patch_3">
@@ -1693,7 +1693,7 @@ L 111.994062 88.74
   </g>
  </g>
  <defs>
-  <clipPath id="pec2661c553">
+  <clipPath id="pbc07bd9013">
    <rect height="81.54" width="83.7" x="28.294063" y="7.2"/>
   </clipPath>
  </defs>

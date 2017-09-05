@@ -71,7 +71,7 @@ for type in ['Control', 'GABAzine']:
         marginOfBaseLine, marginOfInterest = find_BaseLine_and_WindowOfInterest_Margins(photoDiode, threshold,
                 baselineWindowWidth, interestWindowWidth)
         print (inputDir.split('/')[-1])
-        if any(x in inputDir.split('/')[-1] for x in ['CS', 'spikes']):
+        if any(x in inputDir.split('/')[-1] for x in ['CS', 'spikes, CA3_CPP']):
             neuron.analyzeExperiment(type, numSquares, voltageTrace, photoDiode, coords, marginOfBaseLine, marginOfInterest,
                                  F_sample, smootheningTime, removeAP=False)
         else:

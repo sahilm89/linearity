@@ -21,27 +21,27 @@ class Neuron:
                           "photodiode_flag"]
         self.save_trial = save_trial
 
-    def analyzeExperiment(self, type, squares, voltage, photodiode, coords,
+    def analyzeExperiment(self, exptype, squares, voltage, photodiode, coords,
                           marginOfBaseLine, marginOfInterest,
                           F_sample, smootheningTime, filtering='', removeAP=True):
         self.removeAP = removeAP
         self.filtering = filtering
-        if type not in self.experiment:
-            self.experiment[type] = {squares: Experiment(self, type, squares,
+        if exptype not in self.experiment:
+            self.experiment[exptype] = {squares: Experiment(self, exptype, squares,
                                      voltage, photodiode, coords,
                                      marginOfBaseLine, marginOfInterest,
                                      F_sample, smootheningTime)}
         else:
-            self.experiment[type].update({squares: Experiment(self, type,
+            self.experiment[exptype].update({squares: Experiment(self, exptype,
                                           squares, voltage, photodiode,
                                           coords, marginOfBaseLine,
                                           marginOfInterest, F_sample,
                                           smootheningTime)})
         # self.experiment[type][squares]._transformTrials()
-        self.experiment[type][squares]._groupTrialsByCoords()  # Coord grouping
+        self.experiment[exptype][squares]._groupTrialsByCoords()  # Coord grouping
         # self.experiment[type][squares]._transformCoords()
         if not squares == 1:
-            self.experiment[type][squares]._findRegressionCoefficients()
+            self.experiment[exptype][squares]._findRegressionCoefficients()
 
     def save(self, filename):
         directory = os.path.dirname(filename)
@@ -64,11 +64,11 @@ class Neuron:
 
 class Experiment:
     ''' Change this to key: [coords, photodiode, value]'''
-    def __init__(self, neuron, type, numSquares, voltage, photodiode, coords,
+    def __init__(self, neuron, exptype, numSquares, voltage, photodiode, coords,
                  marginOfBaseline, marginOfInterest,
                  F_sample, smootheningTime):
         self.neuron = neuron
-        self.type = type
+        self.type = exptype
         self.numSquares = numSquares
         self.F_sample = F_sample
         self.samplingTime = 1./self.F_sample
@@ -235,13 +235,13 @@ class Trial:
         if feature == 0:
             return self._findMaximum()
         elif feature == 1:
-            return self._areaUnderTheCurve(self.F_sample)
+            return self._areaUnderTheCurve()
         elif feature == 2:
             return self._findMean()
         elif feature == 3:
-            return self._findTimeToPeak(self.F_sample)
+            return self._findTimeToPeak()
         elif feature == 4:
-            return self._areaUnderTheCurveToPeak(self.F_sample)
+            return self._areaUnderTheCurveToPeak()
         elif feature == 5:
             return self._findMinimum()
         elif feature == 6:
@@ -256,7 +256,7 @@ class Trial:
         '''Finds the maximum of the vector in a given interest'''
         return np.min(self.interestWindow)
 
-    def _findTimeToPeak(self, samplingFreq):
+    def _findTimeToPeak(self):
         '''Finds the time to maximum of the vector in a given interest'''
         maxIndex = np.argmax(self.interestWindow)
         timeToPeak = (maxIndex)*self.samplingTime
@@ -266,17 +266,17 @@ class Trial:
         '''Finds the mean of the vector in a given interest'''
         return np.average(self.interestWindow)
 
-    def _areaUnderTheCurve(self, samplingFreq):
+    def _areaUnderTheCurve(self, binSize=10):
         '''Finds the area under the curve of the vector in the given window.
            This will subtract negative area from the total area.'''
-        auc = np.trapz(self.interestWindow, dx=self.samplingTime)  # in V.s
+        auc = np.trapz(self.interestWindow, dx=binSize*self.samplingTime)  # in V.s
         return auc
 
-    def _areaUnderTheCurveToPeak(self, samplingFreq):
+    def _areaUnderTheCurveToPeak(self, binSize=10):
         '''Finds the area under the curve of the vector in the given window'''
         maxIndex = np.argmax(self.interestWindow)
         windowToPeak = self.interestWindow[:maxIndex+1]
-        auctp = np.trapz(windowToPeak, dx=self.samplingTime)  # in V.s
+        auctp = np.trapz(windowToPeak, dx=binSize*self.samplingTime)  # in V.s
         return auctp
 
     def _findOnsetTime(self, samplingFreq, step=2., slide = 0.05, maxOnset = 50., initpValTolerance=0.5):
@@ -298,7 +298,7 @@ class Trial:
     def _flagActionPotentials(self, AP_threshold=30):
         ''' This function flags if there is an AP trialwise and returns a dict of bools '''
         if np.max(self.interestWindow) > AP_threshold:
-            print "Action Potential in trial {}".format(self.index)
+            print "Action Potential in trial {} {} {}".format(self.index, np.max(self.interestWindow), self.interestWindow)
             return 1
         else:
             return 0

@@ -27,7 +27,7 @@ z
 " style="fill:none;"/>
    </g>
    <g id="line2d_1">
-    <path clip-path="url(#pe7e6daa7ab)" d="M 45.90767 36.048887 
+    <path clip-path="url(#p5e8ed35f57)" d="M 45.90767 36.048887 
 L 46.059928 36.000137 
 L 46.288315 35.836716 
 L 46.592831 36.064083 
@@ -323,10 +323,10 @@ L 121.313419 34.155543
 L 121.884386 35.074147 
 L 121.99858 35.041619 
 L 121.99858 35.041619 
-" style="fill:none;opacity:0.6;stroke:#0000ff;stroke-linecap:round;"/>
+" style="fill:none;opacity:0.6;stroke:#0000ff;stroke-linecap:round;stroke-width:0.5;"/>
    </g>
    <g id="line2d_2">
-    <path clip-path="url(#pe7e6daa7ab)" d="M 45.90767 35.687807 
+    <path clip-path="url(#p5e8ed35f57)" d="M 45.90767 35.687807 
 L 51.236699 35.687807 
 L 51.350892 34.952921 
 L 52.302504 28.50864 
@@ -357,10 +357,10 @@ L 110.198589 34.934727
 L 118.039873 35.273646 
 L 121.99858 35.381608 
 L 121.99858 35.381608 
-" style="fill:none;stroke:#0000ff;stroke-dasharray:3.7,1.6;stroke-dashoffset:0;"/>
+" style="fill:none;stroke:#0000ff;stroke-dasharray:1.85,0.8;stroke-dashoffset:0;stroke-width:0.5;"/>
    </g>
    <g id="line2d_3">
-    <path clip-path="url(#pe7e6daa7ab)" d="M 45.90767 34.976535 
+    <path clip-path="url(#p5e8ed35f57)" d="M 45.90767 34.976535 
 L 46.288315 34.811041 
 L 46.554767 34.773094 
 L 46.935412 34.4825 
@@ -694,10 +694,10 @@ L 121.57987 45.114175
 L 121.770193 45.045923 
 L 121.99858 44.973402 
 L 121.99858 44.973402 
-" style="fill:none;opacity:0.6;stroke:#008000;stroke-linecap:round;"/>
+" style="fill:none;opacity:0.6;stroke:#008000;stroke-linecap:round;stroke-width:0.5;"/>
    </g>
    <g id="line2d_4">
-    <path clip-path="url(#pe7e6daa7ab)" d="M 45.90767 35.687807 
+    <path clip-path="url(#p5e8ed35f57)" d="M 45.90767 35.687807 
 L 52.26444 35.687807 
 L 52.492827 39.230264 
 L 53.406374 52.021316 
@@ -731,68 +731,68 @@ L 114.157295 46.195514
 L 119.02955 44.705115 
 L 121.99858 43.902578 
 L 121.99858 43.902578 
-" style="fill:none;stroke:#008000;stroke-dasharray:3.7,1.6;stroke-dashoffset:0;"/>
+" style="fill:none;stroke:#008000;stroke-dasharray:1.85,0.8;stroke-dashoffset:0;stroke-width:0.5;"/>
    </g>
    <g id="patch_3">
     <path d="M 42.103125 88.74 
 L 42.103125 7.2 
-" style="fill:none;stroke:#262626;stroke-linecap:square;stroke-linejoin:miter;stroke-width:1.25;"/>
+" style="fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;"/>
    </g>
    <g id="patch_4">
     <path d="M 42.103125 88.74 
 L 125.803125 88.74 
-" style="fill:none;stroke:#262626;stroke-linecap:square;stroke-linejoin:miter;stroke-width:1.25;"/>
+" style="fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;"/>
    </g>
    <g id="matplotlib.axis_1">
     <g id="xtick_1">
      <g id="line2d_5"/>
      <g id="text_1">
-      <text style="fill:#262626;font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:middle;" transform="rotate(-0, 45.90767, 97.96625)" x="45.90767" y="97.96625">0</text>
+      <text style="font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:middle;" transform="rotate(-0, 45.90767, 97.96625)" x="45.90767" y="97.96625">0</text>
      </g>
     </g>
     <g id="xtick_2">
      <g id="line2d_6"/>
      <g id="text_2">
-      <text style="fill:#262626;font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:middle;" transform="rotate(-0, 83.972157, 97.96625)" x="83.972157" y="97.96625">50</text>
+      <text style="font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:middle;" transform="rotate(-0, 83.972157, 97.96625)" x="83.972157" y="97.96625">50</text>
      </g>
     </g>
     <g id="xtick_3">
      <g id="line2d_7"/>
      <g id="text_3">
-      <text style="fill:#262626;font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:middle;" transform="rotate(-0, 122.036644, 97.96625)" x="122.036644" y="97.96625">100</text>
+      <text style="font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:middle;" transform="rotate(-0, 122.036644, 97.96625)" x="122.036644" y="97.96625">100</text>
      </g>
     </g>
     <g id="text_4">
-     <text style="fill:#262626;font-family:Arial;font-size:10px;font-style:normal;font-weight:400;text-anchor:middle;" transform="rotate(-0, 83.953125, 110.835938)" x="83.953125" y="110.835938">Time (ms)</text>
+     <text style="font-family:Arial;font-size:10px;font-style:normal;font-weight:400;text-anchor:middle;" transform="rotate(-0, 83.953125, 110.835938)" x="83.953125" y="110.835938">Time (ms)</text>
     </g>
    </g>
    <g id="matplotlib.axis_2">
     <g id="ytick_1">
      <g id="line2d_8"/>
      <g id="text_5">
-      <text style="fill:#262626;font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:end;" transform="rotate(-0, 38.603125, 86.943872)" x="38.603125" y="86.943872">−400</text>
+      <text style="font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:end;" transform="rotate(-0, 38.603125, 86.943872)" x="38.603125" y="86.943872">−400</text>
      </g>
     </g>
     <g id="ytick_2">
      <g id="line2d_9"/>
      <g id="text_6">
-      <text style="fill:#262626;font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:end;" transform="rotate(-0, 38.603125, 62.747402)" x="38.603125" y="62.747402">−200</text>
+      <text style="font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:end;" transform="rotate(-0, 38.603125, 62.747402)" x="38.603125" y="62.747402">−200</text>
      </g>
     </g>
     <g id="ytick_3">
      <g id="line2d_10"/>
      <g id="text_7">
-      <text style="fill:#262626;font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:end;" transform="rotate(-0, 38.603125, 38.550932)" x="38.603125" y="38.550932">0</text>
+      <text style="font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:end;" transform="rotate(-0, 38.603125, 38.550932)" x="38.603125" y="38.550932">0</text>
      </g>
     </g>
     <g id="ytick_4">
      <g id="line2d_11"/>
      <g id="text_8">
-      <text style="fill:#262626;font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:end;" transform="rotate(-0, 38.603125, 14.354463)" x="38.603125" y="14.354463">200</text>
+      <text style="font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:end;" transform="rotate(-0, 38.603125, 14.354463)" x="38.603125" y="14.354463">200</text>
      </g>
     </g>
     <g id="text_9">
-     <text style="fill:#262626;font-family:Arial;font-size:10px;font-style:normal;font-weight:400;text-anchor:middle;" transform="rotate(-90, 14.479688, 47.97)" x="14.479688" y="47.97">Current (pA)</text>
+     <text style="font-family:Arial;font-size:10px;font-style:normal;font-weight:400;text-anchor:middle;" transform="rotate(-90, 14.479688, 47.97)" x="14.479688" y="47.97">Current (pA)</text>
     </g>
    </g>
    <g id="text_10">
@@ -804,7 +804,7 @@ L 125.803125 88.74
   </g>
  </g>
  <defs>
-  <clipPath id="pe7e6daa7ab">
+  <clipPath id="p5e8ed35f57">
    <rect height="81.54" width="83.7" x="42.103125" y="7.2"/>
   </clipPath>
  </defs>

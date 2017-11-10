@@ -15,11 +15,11 @@ if [ -d "$cell/CPP/" ]; then
 fi
 done
 
-## Checking for CPP under cut slices current clamp cells
-find /media/sahil/NCBS_Shares_BGStim/patch_data/ -mindepth 1 -type d -name 'c?_CS'|while read cell ; do 
+## Checking for CPP under current clamp cells (removed cells)
+find /media/sahil/NCBS_Shares_BGStim/patch_data/ -mindepth 1 -type d -name 'c?_rem'|while read cell ; do 
 if [ -d "$cell/CPP/" ]; then
    echo $cell
-  echo "$cell/">>/media/sahil/NCBS_Shares_BGStim/patch_data/current_clamp_files.txt
+  echo "$cell/">>/media/sahil/NCBS_Shares_BGStim/patch_data/current_clamp_removed_files.txt
 fi
 done
 

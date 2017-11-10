@@ -43,10 +43,10 @@ def fitFunctionToPSP(time, vector, type, t_0=0, g_max=0):
         else:
             model.set_param_hint('g_max', value = g_max, vary=False)
 
-        model.set_param_hint('tOn', value =max(time)/5.1 , min = 0., max = max(time))
-        model.set_param_hint('t_ratio', value =10., min=1.05)
-        model.set_param_hint('tOff', min = 0., expr='tOn*t_ratio')
-        model.set_param_hint('t_peak', expr = 't_0 + ((tOff * tOn)/(tOff-tOn)) * log(tOff/tOn)')
+        model.set_param_hint('tOn', value = max(time)/10. , min = 0., max = max(time))
+        #model.set_param_hint('t_ratio', value =10., min=1.05)
+        model.set_param_hint('tOff', value = max(time)/5., min = 0., max = max(time))
+        #model.set_param_hint('t_peak', expr = 't_0 + ((tOff * tOn)/(tOff-tOn)) * log(tOff/tOn)')
         pars = model.make_params()
 
     result = model.fit(vector, pars, t=time)
@@ -60,32 +60,31 @@ def fitFunctionToPSP(time, vector, type, t_0=0, g_max=0):
     #plt.show()
     return result
 
-for type in neuron.experiment.keys():
-    #if type == 2:
-        for numSquares in neuron.experiment[type].keys(): 
-            print "Processing {} of {}".format(numSquares, type)
-            trials = neuron.experiment[type][numSquares].trial
+for expType in neuron.experiment.keys():
+    if expType in [1,2]:
+        for numSquares in neuron.experiment[expType].keys(): 
+            print "Processing {} of {}".format(numSquares, expType)
+            trials = neuron.experiment[expType][numSquares].trial
             for i in trials:
                 #avg_psp = np.mean(trials[i].interestWindow)
                 #normalized_interestWindow = trials[i].interestWindow/avg_psp
-                if type == 1:
-                    normalized_interestWindow = -1e6*(trials[i].interestWindow) # Picoamperes and changing signs to positive
-                else:
-                    normalized_interestWindow = 1e6*(trials[i].interestWindow) # Picoamperes and changing signs to positive
+                if expType == 1:
+                    normalizingFactor = np.max(-trials[i].interestWindow)
+                    normalized_interestWindow = -trials[i].interestWindow/normalizingFactor # Picoamperes and changing signs to positive
+                if expType == 2:
+                    normalizingFactor = np.max(trials[i].interestWindow)
+                    normalized_interestWindow = trials[i].interestWindow/normalizingFactor # Picoamperes and changing signs to positive
                 time = np.arange(len(trials[i].interestWindow))*trials[i].samplingTime
-                if trials[i].experiment.type == 1 or trials[i].experiment.type == 2:
-                    print trials[i].feature[6], 1e6*trials[i].feature[0]
-                    try:
-                        result = fitFunctionToPSP(time, normalized_interestWindow, trials[i].experiment.type)
-                        if result.redchi <= 0.1:
-                            trials[i].fit = result.params
-                            #trials[i].fit["g_max"].value*= avg_psp 
-                        else:
-                            trials[i].fit = None 
-                    except:
-                        trials[i].fit = None 
+
+                result = fitFunctionToPSP(time, normalized_interestWindow, trials[i].experiment.type)
+                if result.bic <= -10000:
+                    trials[i].fit = result.params
+                    trials[i].fit["g_max"].value*= normalizingFactor 
+                else:
+                    trials[i].fit = None 
+
                 print "{} done.".format(i)
 
-        print "Processed all for {} of type {}".format(numSquares, type)
+        print "Processed all for {} of type {}".format(numSquares, expType)
 with open(plotDir + '/' + neuron.index + '_fits.pkl', 'w') as input:
     neuron = pickle.dump(neuron, input, pickle.HIGHEST_PROTOCOL)

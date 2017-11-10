@@ -2,7 +2,7 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <!-- Created with matplotlib (http://matplotlib.org/) -->
-<svg height="144pt" version="1.1" viewBox="0 0 144 144" width="144pt" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg height="120pt" version="1.1" viewBox="0 0 124 120" width="124pt" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
  <defs>
   <style type="text/css">
 *{stroke-linecap:butt;stroke-linejoin:round;}
@@ -10,20 +10,154 @@
  </defs>
  <g id="figure_1">
   <g id="patch_1">
-   <path d="M 0 144 
-L 144 144 
-L 144 0 
+   <path d="M 0 120.25625 
+L 124.1975 120.25625 
+L 124.1975 0 
 L 0 0 
 z
 " style="fill:none;opacity:0;"/>
   </g>
   <g id="axes_1">
    <g id="patch_2">
-    <path d="M 18 126 
-L 129.6 126 
-L 129.6 17.28 
-L 18 17.28 
+    <path d="M 33.2975 88.74 
+L 116.9975 88.74 
+L 116.9975 7.2 
+L 33.2975 7.2 
 z
 " style="fill:none;"/>
    </g>
-   <g id="PathCollection_1"
+   <g id="PathCollection_1">
+    <defs>
+     <path d="M 0 3.162278 
+C 0.838646 3.162278 1.643056 2.82908 2.236068 2.236068 
+C 2.82908 1.643056 3.162278 0.838646 3.162278 0 
+C 3.162278 -0.838646 2.82908 -1.643056 2.236068 -2.236068 
+C 1.643056 -2.82908 0.838646 -3.162278 0 -3.162278 
+C -0.838646 -3.162278 -1.643056 -2.82908 -2.236068 -2.236068 
+C -2.82908 -1.643056 -3.162278 -0.838646 -3.162278 0 
+C -3.162278 0.838646 -2.82908 1.643056 -2.236068 2.236068 
+C -1.643056 2.82908 -0.838646 3.162278 0 3.162278 
+z
+" id="m30cce18b4a" style="stroke:#000000;"/>
+    </defs>
+    <g clip-path="url(#pf0de092d55)">
+     <use style="stroke:#000000;" x="38.234049" xlink:href="#m30cce18b4a" y="-1"/>
+     <use style="stroke:#000000;" x="41.564167" xlink:href="#m30cce18b4a" y="26.006335"/>
+     <use style="stroke:#000000;" x="49.830833" xlink:href="#m30cce18b4a" y="53.56746"/>
+     <use style="stroke:#000000;" x="58.0975" xlink:href="#m30cce18b4a" y="64.898177"/>
+     <use style="stroke:#000000;" x="66.364167" xlink:href="#m30cce18b4a" y="69.556374"/>
+     <use style="stroke:#000000;" x="74.630833" xlink:href="#m30cce18b4a" y="71.471416"/>
+     <use style="stroke:#000000;" x="82.8975" xlink:href="#m30cce18b4a" y="72.258713"/>
+     <use style="stroke:#000000;" x="91.164167" xlink:href="#m30cce18b4a" y="72.582381"/>
+     <use style="stroke:#000000;" x="99.430833" xlink:href="#m30cce18b4a" y="72.715444"/>
+     <use style="stroke:#000000;" x="107.6975" xlink:href="#m30cce18b4a" y="72.770149"/>
+    </g>
+   </g>
+   <g id="patch_3">
+    <path d="M 33.2975 88.74 
+L 33.2975 7.2 
+" style="fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 33.2975 88.74 
+L 116.9975 88.74 
+" style="fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;"/>
+   </g>
+   <g id="matplotlib.axis_1">
+    <g id="xtick_1">
+     <g id="line2d_1"/>
+     <g id="text_1">
+      <text style="font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:middle;" transform="rotate(-0, 33.2975, 97.96625)" x="33.2975" y="97.96625">0</text>
+     </g>
+    </g>
+    <g id="xtick_2">
+     <g id="line2d_2"/>
+     <g id="text_2">
+      <text style="font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:middle;" transform="rotate(-0, 51.8975, 97.96625)" x="51.8975" y="97.96625">1</text>
+     </g>
+    </g>
+    <g id="xtick_3">
+     <g id="line2d_3"/>
+     <g id="text_3">
+      <text style="font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:middle;" transform="rotate(-0, 70.4975, 97.96625)" x="70.4975" y="97.96625">2</text>
+     </g>
+    </g>
+    <g id="xtick_4">
+     <g id="line2d_4"/>
+     <g id="text_4">
+      <text style="font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:middle;" transform="rotate(-0, 89.0975, 97.96625)" x="89.0975" y="97.96625">3</text>
+     </g>
+    </g>
+    <g id="text_5">
+     <!-- $g_{exc}$ (nS) -->
+     <g transform="translate(54.8475 110.85625)">
+      <text>
+       <tspan style="font-family:DejaVu Sans;font-size:10px;font-style:oblique;font-weight:oblique;" x="0" y="-0.71875">g</tspan>
+       <tspan style="font-family:DejaVu Sans;font-size:7px;font-style:oblique;font-weight:oblique;" x="6.347656 10.654297 14.796875" y="0.921875">exc</tspan>
+       <tspan style="font-family:Arial;font-size:10px;font-style:regular;font-weight:regular;" x="18.918945 21.697266 25.027344 30.588867 37.258789" y="-0.71875"> (nS)</tspan>
+      </text>
+     </g>
+    </g>
+   </g>
+   <g id="matplotlib.axis_2">
+    <g id="ytick_1">
+     <g id="line2d_5"/>
+     <g id="text_6">
+      <text style="font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:end;" transform="rotate(-0, 29.7975, 91.603125)" x="29.7975" y="91.603125">0</text>
+     </g>
+    </g>
+    <g id="ytick_2">
+     <g id="line2d_6"/>
+     <g id="text_7">
+      <text style="font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:end;" transform="rotate(-0, 29.7975, 79.05851)" x="29.7975" y="79.05851">2</text>
+     </g>
+    </g>
+    <g id="ytick_3">
+     <g id="line2d_7"/>
+     <g id="text_8">
+      <text style="font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:end;" transform="rotate(-0, 29.7975, 66.513894)" x="29.7975" y="66.513894">4</text>
+     </g>
+    </g>
+    <g id="ytick_4">
+     <g id="line2d_8"/>
+     <g id="text_9">
+      <text style="font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:end;" transform="rotate(-0, 29.7975, 53.969279)" x="29.7975" y="53.969279">6</text>
+     </g>
+    </g>
+    <g id="ytick_5">
+     <g id="line2d_9"/>
+     <g id="text_10">
+      <text style="font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:end;" transform="rotate(-0, 29.7975, 41.424663)" x="29.7975" y="41.424663">8</text>
+     </g>
+    </g>
+    <g id="ytick_6">
+     <g id="line2d_10"/>
+     <g id="text_11">
+      <text style="font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:end;" transform="rotate(-0, 29.7975, 28.880048)" x="29.7975" y="28.880048">10</text>
+     </g>
+    </g>
+    <g id="ytick_7">
+     <g id="line2d_11"/>
+     <g id="text_12">
+      <text style="font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:end;" transform="rotate(-0, 29.7975, 16.335433)" x="29.7975" y="16.335433">12</text>
+     </g>
+    </g>
+    <g id="text_13">
+     <!-- $\delta_i$ (ms) -->
+     <g transform="translate(14.7 63.57)rotate(-90)">
+      <text>
+       <tspan style="font-family:DejaVu Sans;font-size:10px;font-style:oblique;font-weight:oblique;" x="0" y="-0.578125">δ</tspan>
+       <tspan style="font-family:DejaVu Sans;font-size:7px;font-style:oblique;font-weight:oblique;" x="6.118164" y="1.0625">i</tspan>
+       <tspan style="font-family:Arial;font-size:10px;font-style:regular;font-weight:regular;" x="8.336426 11.114746 14.444824 22.774902 27.774902" y="-0.578125"> (ms)</tspan>
+      </text>
+     </g>
+    </g>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="pf0de092d55">
+   <rect height="81.54" width="83.7" x="33.2975" y="7.2"/>
+  </clipPath>
+ </defs>
+</svg>

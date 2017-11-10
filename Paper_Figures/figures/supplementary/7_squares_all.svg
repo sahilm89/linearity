@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Created with matplotlib (http://matplotlib.org/) -->
+<svg height="172pt" version="1.1" viewBox="0 0 179 172" width="179pt" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+*{stroke-linecap:butt;stroke-linejoin:round;}
+  </style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 172.113062 
+L 179.455 172.113062 
+L 179.455 0 
+L 0 0 
+z
+" style="fill:none;"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 60.655 130.9515 
+L 172.255 130.9515 
+L 172.255 20.0715 
+L 60.655 20.0715 
+z
+" style="fill:none;"/>
+   </g>
+   <g id="patch_3">
+    <path clip-path="url(#p7d6900f7fc)" d="M 65.727727 130.9515 
+L 75.873182 130.9515 
+L 75.873182 25.3515 
+L 65.727727 25.3515 
+z
+"/>
+   </g>
+   <g id="patch_4">
+    <path clip-path="url(#p7d6900f7fc)" d="M 75.873182 130.9515 
+L 86.018636 130.9515 
+L 86.018636 43.950796 
+L 75.873182 43.950796 
+z
+"/>
+   </g>
+   <g id="patch_5">
+    <path clip-path="url(#p7d6900f7fc)" d="M 86.018636 130.9515 
+L 96.164091 130.9515 
+L 96.164091 70.043931 
+L 86.018636 70.043931 
+z
+"/>
+   </g>
+   <g id="patch_6">
+    <path clip-path="url(#p7d6900f7fc)" d="M 96.164091 130.9515 
+L 106.309545 130.9515 
+L 106.309545 94.751195 
+L 96.164091 94.751195 
+z
+"/>
+   </g>
+   <g id="patch_7">
+    <path clip-path="url(#p7d6900f7fc)" d="M 106.309545 130.9515 
+L 116.455 130.9515 
+L 116.455 112.811824 
+L 106.309545 112.811824 
+z
+"/>
+   </g>
+   <g id="patch_8">
+    <path clip-path="url(#p7d6900f7fc)" d="M 116.455 130.9515 
+L 126.600455 130.9515 
+L 126.600455 123.399969 
+L 116.455 123.399969 
+z
+"/>
+   </g>
+   <g id="patch_9">
+    <path clip-path="url(#p7d6900f7fc)" d="M 126.600455 130.9515 
+L 136.745909 130.9515 
+L 136.745909 128.415942 
+L 126.600455 128.415942 
+z
+"/>
+   </g>
+   <g id="patch_10">
+    <path clip-path="url(#p7d6900f7fc)" d="M 136.745909 130.9515 
+L 146.891364 130.9515 
+L 146.891364 130.28502 
+L 136.745909 130.28502 
+z
+"/>
+   </g>
+   <g id="patch_11">
+    <path clip-path="url(#p7d6900f7fc)" d="M 146.891364 130.9515 
+L 157.036818 130.9515 
+L 157.036818 130.827192 
+L 146.891364 130.827192 
+z
+"/>
+   </g>
+   <g id="patch_12">
+    <path clip-path="url(#p7d6900f7fc)" d="M 157.036818 130.9515 
+L 167.182273 130.9515 
+L 167.182273 130.939707 
+L 157.036818 130.939707 
+z
+"/>
+   </g>
+   <g id="patch_13">
+    <path d="M 50.655 130.9515 
+L 50.655 20.0715 
+" style="fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;"/>
+   </g>
+   <g id="patch_14">
+    <path d="M 60.655 140.9515 
+L 172.255 140.9515 
+" style="fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;"/>
+   </g>
+   <g id="matplotlib.axis_1">
+    <g id="xtick_1">
+     <g id="line2d_1"/>
+     <g id="text_1">
+      <text style="font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:middle;" transform="rotate(-0, 90.568147, 150.17775)" x="90.568147" y="150.17775">18</text>
+     </g>
+    </g>
+    <g id="xtick_2">
+     <g id="line2d_2"/>
+     <g id="text_2">
+      <text style="font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:middle;" transform="rotate(-0, 127.206635, 150.17775)" x="127.206635" y="150.17775">20</text>
+     </g>
+    </g>
+    <g id="xtick_3">
+     <g id="line2d_3"/>
+     <g id="text_3">
+      <text style="font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:middle;" transform="rotate(-0, 163.845122, 150.17775)" x="163.845122" y="150.17775">22</text>
+     </g>
+    </g>
+    <g id="text_4">
+     <!-- $V_{max}$ -->
+     <g transform="translate(105.255 162.925562)">
+      <text>
+       <tspan style="font-family:DejaVu Sans;font-size:10px;font-style:oblique;font-weight:oblique;" x="0" y="-0.703125">V</tspan>
+       <tspan style="font-family:DejaVu Sans;font-size:7px;font-style:oblique;font-weight:oblique;" x="6.84082 13.659668 17.949219" y="0.9375">max</tspan>
+      </text>
+     </g>
+    </g>
+   </g>
+   <g id="matplotlib.axis_2">
+    <g id="ytick_1">
+     <g id="line2d_4"/>
+     <g id="text_5">
+      <text style="font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:end;" transform="rotate(-0, 47.155, 133.814625)" x="47.155" y="133.814625">0</text>
+     </g>
+    </g>
+    <g id="ytick_2">
+     <g id="line2d_5"/>
+     <g id="text_6">
+      <text style="font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:end;" transform="rotate(-0, 47.155, 101.940864)" x="47.155" y="101.940864">100000</text>
+     </g>
+    </g>
+    <g id="ytick_3">
+     <g id="line2d_6"/>
+     <g id="text_7">
+      <text style="font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:end;" transform="rotate(-0, 47.155, 70.067104)" x="47.155" y="70.067104">200000</text>
+     </g>
+    </g>
+    <g id="ytick_4">
+     <g id="line2d_7"/>
+     <g id="text_8">
+      <text style="font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:end;" transform="rotate(-0, 47.155, 38.193343)" x="47.155" y="38.193343">300000</text>
+     </g>
+    </g>
+    <g id="text_9">
+     <text style="font-family:Arial;font-size:10px;font-style:normal;font-weight:400;text-anchor:middle;" transform="rotate(-90, 14.357812, 75.5115)" x="14.357812" y="75.5115">Frequency</text>
+    </g>
+   </g>
+   <g id="text_10">
+    <text style="font-family:Arial;font-size:9.6px;font-style:normal;font-weight:400;text-anchor:middle;" transform="rotate(-0, 116.455, 14.0715)" x="116.455" y="14.0715">7 squares</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p7d6900f7fc">
+   <rect height="110.88" width="111.6" x="60.655" y="20.0715"/>
+  </clipPath>
+ </defs>
+</svg>

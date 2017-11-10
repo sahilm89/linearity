@@ -27,7 +27,7 @@ z
 " style="fill:none;"/>
    </g>
    <g id="line2d_1">
-    <path clip-path="url(#p5e8ed35f57)" d="M 45.90767 36.048887 
+    <path clip-path="url(#p7e07839ee3)" d="M 45.90767 36.048887 
 L 46.059928 36.000137 
 L 46.288315 35.836716 
 L 46.592831 36.064083 
@@ -323,10 +323,10 @@ L 121.313419 34.155543
 L 121.884386 35.074147 
 L 121.99858 35.041619 
 L 121.99858 35.041619 
-" style="fill:none;opacity:0.6;stroke:#0000ff;stroke-linecap:round;stroke-width:0.5;"/>
+" style="fill:none;opacity:0.6;stroke:#4b0082;stroke-linecap:round;stroke-width:0.5;"/>
    </g>
    <g id="line2d_2">
-    <path clip-path="url(#p5e8ed35f57)" d="M 45.90767 35.687807 
+    <path clip-path="url(#p7e07839ee3)" d="M 45.90767 35.687807 
 L 51.236699 35.687807 
 L 51.350892 34.952921 
 L 52.302504 28.50864 
@@ -357,10 +357,10 @@ L 110.198589 34.934727
 L 118.039873 35.273646 
 L 121.99858 35.381608 
 L 121.99858 35.381608 
-" style="fill:none;stroke:#0000ff;stroke-dasharray:1.85,0.8;stroke-dashoffset:0;stroke-width:0.5;"/>
+" style="fill:none;stroke:#4b0082;stroke-linecap:round;stroke-width:0.5;"/>
    </g>
    <g id="line2d_3">
-    <path clip-path="url(#p5e8ed35f57)" d="M 45.90767 34.976535 
+    <path clip-path="url(#p7e07839ee3)" d="M 45.90767 34.976535 
 L 46.288315 34.811041 
 L 46.554767 34.773094 
 L 46.935412 34.4825 
@@ -694,10 +694,10 @@ L 121.57987 45.114175
 L 121.770193 45.045923 
 L 121.99858 44.973402 
 L 121.99858 44.973402 
-" style="fill:none;opacity:0.6;stroke:#008000;stroke-linecap:round;stroke-width:0.5;"/>
+" style="fill:none;opacity:0.6;stroke:#000000;stroke-linecap:round;stroke-width:0.5;"/>
    </g>
    <g id="line2d_4">
-    <path clip-path="url(#p5e8ed35f57)" d="M 45.90767 35.687807 
+    <path clip-path="url(#p7e07839ee3)" d="M 45.90767 35.687807 
 L 52.26444 35.687807 
 L 52.492827 39.230264 
 L 53.406374 52.021316 
@@ -731,7 +731,7 @@ L 114.157295 46.195514
 L 119.02955 44.705115 
 L 121.99858 43.902578 
 L 121.99858 43.902578 
-" style="fill:none;stroke:#008000;stroke-dasharray:1.85,0.8;stroke-dashoffset:0;stroke-width:0.5;"/>
+" style="fill:none;stroke:#000000;stroke-linecap:round;stroke-width:0.5;"/>
    </g>
    <g id="patch_3">
     <path d="M 42.103125 88.74 
@@ -796,15 +796,15 @@ L 125.803125 88.74
     </g>
    </g>
    <g id="text_10">
-    <text style="fill:#0000ff;font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:start;" transform="rotate(-0, 83.972157, 23.589573)" x="83.972157" y="23.589573">Excitation</text>
+    <text style="fill:#4b0082;font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:start;" transform="rotate(-0, 83.972157, 23.589573)" x="83.972157" y="23.589573">Excitation</text>
    </g>
    <g id="text_11">
-    <text style="fill:#008000;font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:start;" transform="rotate(-0, 83.972157, 71.982512)" x="83.972157" y="71.982512">Inhibition</text>
+    <text style="font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:start;" transform="rotate(-0, 83.972157, 71.982512)" x="83.972157" y="71.982512">Inhibition</text>
    </g>
   </g>
  </g>
  <defs>
-  <clipPath id="p5e8ed35f57">
+  <clipPath id="p7e07839ee3">
    <rect height="81.54" width="83.7" x="42.103125" y="7.2"/>
   </clipPath>
  </defs>

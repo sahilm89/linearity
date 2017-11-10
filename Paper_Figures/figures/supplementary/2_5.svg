@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Created with matplotlib (http://matplotlib.org/) -->
+<svg height="120pt" version="1.1" viewBox="0 0 127 120" width="127pt" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+*{stroke-linecap:butt;stroke-linejoin:round;}
+  </style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 120.140625 
+L 127.634219 120.140625 
+L 127.634219 0 
+L 0 0 
+z
+" style="fill:none;opacity:0;"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 32.742812 88.74 
+L 116.442813 88.74 
+L 116.442813 7.2 
+L 32.742812 7.2 
+z
+" style="fill:none;"/>
+   </g>
+   <g id="patch_3">
+    <path clip-path="url(#p79ea75ff99)" d="M 36.547358 88.74 
+L 36.547358 53.699582 
+L 39.171182 53.699582 
+L 39.171182 40.441045 
+L 41.795007 40.441045 
+L 41.795007 11.082857 
+L 44.418831 11.082857 
+L 44.418831 40.441045 
+L 47.042656 40.441045 
+L 47.042656 20.55324 
+L 49.66648 20.55324 
+L 49.66648 14.87101 
+L 52.290305 14.87101 
+L 52.290305 30.023624 
+L 54.914129 30.023624 
+L 54.914129 54.64662 
+L 57.537954 54.64662 
+L 57.537954 57.487735 
+L 60.161778 57.487735 
+L 60.161778 74.534425 
+L 62.785602 74.534425 
+L 62.785602 74.534425 
+L 65.409427 74.534425 
+L 65.409427 72.640348 
+L 68.033251 72.640348 
+L 68.033251 75.481463 
+L 70.657076 75.481463 
+L 70.657076 76.428502 
+L 73.2809 76.428502 
+L 73.2809 76.428502 
+L 75.904725 76.428502 
+L 75.904725 74.534425 
+L 78.528549 74.534425 
+L 78.528549 80.216655 
+L 81.152374 80.216655 
+L 81.152374 83.05777 
+L 83.776198 83.05777 
+L 83.776198 85.898885 
+L 86.400023 85.898885 
+L 86.400023 83.05777 
+L 89.023847 83.05777 
+L 89.023847 88.74 
+L 91.647671 88.74 
+L 91.647671 88.74 
+L 94.271496 88.74 
+L 94.271496 88.74 
+L 96.89532 88.74 
+L 96.89532 87.792962 
+L 99.519145 87.792962 
+L 99.519145 88.74 
+L 102.142969 88.74 
+L 102.142969 88.74 
+L 104.766794 88.74 
+L 104.766794 88.74 
+L 107.390618 88.74 
+L 107.390618 88.74 
+L 110.014443 88.74 
+L 110.014443 88.74 
+L 112.638267 88.74 
+L 112.638267 88.74 
+" style="fill:none;stroke:#808080;stroke-linejoin:miter;"/>
+   </g>
+   <g id="patch_4">
+    <path clip-path="url(#p79ea75ff99)" d="M 36.547358 88.74 
+L 36.547358 81.163693 
+L 39.171182 81.163693 
+L 39.171182 67.905157 
+L 41.795007 67.905157 
+L 41.795007 48.96439 
+L 44.418831 48.96439 
+L 44.418831 39.494007 
+L 47.042656 39.494007 
+L 47.042656 49.911429 
+L 49.66648 49.911429 
+L 49.66648 47.070314 
+L 52.290305 47.070314 
+L 52.290305 52.752544 
+L 54.914129 52.752544 
+L 54.914129 58.434774 
+L 57.537954 58.434774 
+L 57.537954 57.487735 
+L 60.161778 57.487735 
+L 60.161778 59.381812 
+L 62.785602 59.381812 
+L 62.785602 65.064042 
+L 65.409427 65.064042 
+L 65.409427 62.222927 
+L 68.033251 62.222927 
+L 68.033251 66.01108 
+L 70.657076 66.01108 
+L 70.657076 68.852195 
+L 73.2809 68.852195 
+L 73.2809 78.322578 
+L 75.904725 78.322578 
+L 75.904725 80.216655 
+L 78.528549 80.216655 
+L 78.528549 78.322578 
+L 81.152374 78.322578 
+L 81.152374 75.481463 
+L 83.776198 75.481463 
+L 83.776198 82.110732 
+L 86.400023 82.110732 
+L 86.400023 81.163693 
+L 89.023847 81.163693 
+L 89.023847 84.951847 
+L 91.647671 84.951847 
+L 91.647671 84.951847 
+L 94.271496 84.951847 
+L 94.271496 85.898885 
+L 96.89532 85.898885 
+L 96.89532 84.951847 
+L 99.519145 84.951847 
+L 99.519145 86.845923 
+L 102.142969 86.845923 
+L 102.142969 85.898885 
+L 104.766794 85.898885 
+L 104.766794 84.951847 
+L 107.390618 84.951847 
+L 107.390618 87.792962 
+L 110.014443 87.792962 
+L 110.014443 85.898885 
+L 112.638267 85.898885 
+L 112.638267 88.74 
+" style="fill:none;stroke:#ff0000;stroke-linejoin:miter;"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 32.742812 88.74 
+L 32.742812 7.2 
+" style="fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 32.742812 88.74 
+L 116.442813 88.74 
+" style="fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:miter;"/>
+   </g>
+   <g id="matplotlib.axis_1">
+    <g id="xtick_1">
+     <g id="line2d_1"/>
+     <g id="text_1">
+      <text style="font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:middle;" transform="rotate(-0, 35.670612, 97.96625)" x="35.670612" y="97.96625">0</text>
+     </g>
+    </g>
+    <g id="xtick_2">
+     <g id="line2d_2"/>
+     <g id="text_2">
+      <text style="font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:middle;" transform="rotate(-0, 65.04739, 97.96625)" x="65.04739" y="97.96625">5</text>
+     </g>
+    </g>
+    <g id="xtick_3">
+     <g id="line2d_3"/>
+     <g id="text_3">
+      <text style="font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:middle;" transform="rotate(-0, 94.424168, 97.96625)" x="94.424168" y="97.96625">10</text>
+     </g>
+    </g>
+    <g id="text_4">
+     <text style="font-family:Arial;font-size:10px;font-style:normal;font-weight:400;text-anchor:middle;" transform="rotate(-0, 74.592813, 110.835938)" x="74.592813" y="110.835938">PSP Amplitude (mV)</text>
+    </g>
+   </g>
+   <g id="matplotlib.axis_2">
+    <g id="ytick_1">
+     <g id="line2d_4"/>
+     <g id="text_5">
+      <text style="font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:end;" transform="rotate(-0, 29.242812, 91.603125)" x="29.242812" y="91.603125">0</text>
+     </g>
+    </g>
+    <g id="ytick_2">
+     <g id="line2d_5"/>
+     <g id="text_6">
+      <text style="font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:end;" transform="rotate(-0, 29.242812, 72.662358)" x="29.242812" y="72.662358">20</text>
+     </g>
+    </g>
+    <g id="ytick_3">
+     <g id="line2d_6"/>
+     <g id="text_7">
+      <text style="font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:end;" transform="rotate(-0, 29.242812, 53.721592)" x="29.242812" y="53.721592">40</text>
+     </g>
+    </g>
+    <g id="ytick_4">
+     <g id="line2d_7"/>
+     <g id="text_8">
+      <text style="font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:end;" transform="rotate(-0, 29.242812, 34.780825)" x="29.242812" y="34.780825">60</text>
+     </g>
+    </g>
+    <g id="ytick_5">
+     <g id="line2d_8"/>
+     <g id="text_9">
+      <text style="font-family:Arial;font-size:8px;font-style:normal;font-weight:400;text-anchor:end;" transform="rotate(-0, 29.242812, 15.840059)" x="29.242812" y="15.840059">80</text>
+     </g>
+    </g>
+    <g id="text_10">
+     <text style="font-family:Arial;font-size:10px;font-style:normal;font-weight:400;text-anchor:middle;" transform="rotate(-90, 14.357812, 47.97)" x="14.357812" y="47.97"># recorded PSPs</text>
+    </g>
+   </g>
+   <g id="legend_1">
+    <g id="patch_7">
+     <path d="M 33.31 23.357813 
+L 53.31 23.357813 
+L 53.31 16.357813 
+L 33.31 16.357813 
+z
+" style="fill:none;stroke:#808080;stroke-linejoin:miter;"/>
+    </g>
+    <g id="text_11">
+     <text style="font-family:Arial;font-size:10px;font-style:normal;font-weight:400;text-anchor:start;" transform="rotate(-0, 61.31, 23.357813)" x="61.31" y="23.357813">Control</text>
+    </g>
+    <g id="patch_8">
+     <path d="M 33.31 37.503125 
+L 53.31 37.503125 
+L 53.31 30.503125 
+L 33.31 30.503125 
+z
+" style="fill:none;stroke:#ff0000;stroke-linejoin:miter;"/>
+    </g>
+    <g id="text_12">
+     <text style="font-family:Arial;font-size:10px;font-style:normal;font-weight:400;text-anchor:start;" transform="rotate(-0, 61.31, 37.503125)" x="61.31" y="37.503125">GABAzine</text>
+    </g>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p79ea75ff99">
+   <rect height="81.54" width="83.7" x="32.742812" y="7.2"/>
+  </clipPath>
+ </defs>
+</svg>

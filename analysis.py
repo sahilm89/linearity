@@ -4,14 +4,25 @@ import os
 from util import getInputSizeOfPhotoActiveGrid, readBoxCSV, readMatlabFile, parseDictKeys,\
                  find_BaseLine_and_WindowOfInterest_Margins, createCoords
 import matplotlib.pyplot as plt
-from analysisVariables import *
 import numpy as np
+import imp
 
 inputDir = os.path.abspath(sys.argv[1])
+
+try:
+    print ("Using local variables")
+    aV= imp.load_source('analysisVariables', inputDir + '/analysisVariables.py')
+except:
+    print ("No special instructions, using global variables.")
+    try:
+        import analysisVariables as aV 
+    except:
+        print ("No analysis variable found!")
+
 index, date = inputDir.split('/')[::-1][:2]
 numCoords = 24
 
-neuron = Linearity.Neuron(index, date)
+neuron = Linearity.Neuron(index, date, save_trial=True)
 print neuron.index, neuron.date
 
 for type in ['Control', 'GABAzine']:
@@ -68,15 +79,17 @@ for type in ['Control', 'GABAzine']:
 
         fullDict = readMatlabFile(CPP)
         voltageTrace, photoDiode = parseDictKeys(fullDict)
-        marginOfBaseLine, marginOfInterest = find_BaseLine_and_WindowOfInterest_Margins(photoDiode, threshold,
-                baselineWindowWidth, interestWindowWidth)
+        marginOfBaseLine, marginOfInterest = find_BaseLine_and_WindowOfInterest_Margins(photoDiode, aV.threshold,
+                aV.baselineWindowWidth, aV.interestWindowWidth)
         print (inputDir.split('/')[-1])
-        if any(x in inputDir.split('/')[-1] for x in ['CS', 'spikes, CA3_CPP']):
+        if any(x in inputDir.split('/')[-1] for x in ['CS', 'spikes', 'CA3_CPP']):
+	    print ("Not removing APs for these cells")
             neuron.analyzeExperiment(type, numSquares, voltageTrace, photoDiode, coords, marginOfBaseLine, marginOfInterest,
-                                 F_sample, smootheningTime, removeAP=False)
+                                 aV.F_sample, aV.smootheningTime, removeAP=False)
         else:
+            print ("Removing APs for these cells")
             neuron.analyzeExperiment(type, numSquares, voltageTrace, photoDiode, coords, marginOfBaseLine, marginOfInterest,
-                                 F_sample, smootheningTime, removeAP=True, filtering=filtering)
+                                 aV.F_sample, aV.smootheningTime, removeAP=True, filtering=aV.filtering)
 
 if not os.path.exists(inputDir + '/plots/'):
     os.makedirs(inputDir + '/plots/')

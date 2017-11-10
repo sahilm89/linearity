@@ -159,12 +159,21 @@ class Experiment:
             observed = []
             for coord in self.coordwise.keys():
                 if feature in list(set(self.coordwise[coord].feature) and set(self.coordwise[coord].expected_feature.keys())):
-                    expected.append(self.coordwise[coord].expected_feature[feature])
-                    observed.append(self.coordwise[coord].average_feature[feature])
-            self.regression_coefficients.update(
-                    {feature: {key: value for key, value in
-                               zip(['slope', 'intercept', 'r_val', 'p_val', 'stderr'],
-                                   ss.linregress(expected, observed))}})
+                    if not (np.isnan(self.coordwise[coord].expected_feature[feature]) or np.isnan(self.coordwise[coord].average_feature[feature])):
+                        expected.append(self.coordwise[coord].expected_feature[feature])
+                        observed.append(self.coordwise[coord].average_feature[feature])
+            if len(expected) and len(observed):
+                self.regression_coefficients.update(
+                        {feature: {key: value for key, value in
+                                   zip(['slope', 'intercept', 'r_val', 'p_val', 'stderr'],
+                                       ss.linregress(expected, observed))}})
+            else:
+                self.regression_coefficients.update(
+                        {feature: {key: value for key, value in
+                                   zip(['slope', 'intercept', 'r_val', 'p_val', 'stderr'],
+                                       [np.nan]*5)}})
+ 
+
 
 #    def _findAverageFeatures(self):
 #        ''' Finds the expected feature from one squares data '''
@@ -202,7 +211,7 @@ class Trial:
         self.baselineWindow = v_conversion * voltage[self.experiment.marginOfBaseline[0]:self.experiment.marginOfBaseline[1]]
         self.interestWindow, self.baseline = self._normalizeToBaseline(self.interestWindow_raw, self.baselineWindow)
         self.setupFlags()
-        self._filter(self.experiment.neuron.filtering)
+        self.interestWindow = self._filter(self.experiment.neuron.filtering)
         #self._smoothen(self.smootheningTime, self.F_sample)
 
         # All features here, move some features out of this for APs
@@ -269,14 +278,16 @@ class Trial:
     def _areaUnderTheCurve(self, binSize=10):
         '''Finds the area under the curve of the vector in the given window.
            This will subtract negative area from the total area.'''
-        auc = np.trapz(self.interestWindow, dx=binSize*self.samplingTime)  # in V.s
+        undersampling = self.interestWindow[::binSize]
+        auc = np.trapz(undersampling, dx=self.samplingTime*binSize)  # in V.s
         return auc
 
     def _areaUnderTheCurveToPeak(self, binSize=10):
         '''Finds the area under the curve of the vector in the given window'''
-        maxIndex = np.argmax(self.interestWindow)
-        windowToPeak = self.interestWindow[:maxIndex+1]
-        auctp = np.trapz(windowToPeak, dx=binSize*self.samplingTime)  # in V.s
+        undersampling = self.interestWindow[::binSize]
+        maxIndex = np.argmax(undersampling)
+        windowToPeak = undersampling[:maxIndex+1]
+        auctp = np.trapz(windowToPeak, dx=self.samplingTime*binSize)  # in V.s
         return auctp
 
     def _findOnsetTime(self, samplingFreq, step=2., slide = 0.05, maxOnset = 50., initpValTolerance=0.5):
@@ -298,7 +309,7 @@ class Trial:
     def _flagActionPotentials(self, AP_threshold=30):
         ''' This function flags if there is an AP trialwise and returns a dict of bools '''
         if np.max(self.interestWindow) > AP_threshold:
-            print "Action Potential in trial {} {} {}".format(self.index, np.max(self.interestWindow), self.interestWindow)
+            print "Action Potential in trial {} amplitude= {}".format(self.index, np.max(self.interestWindow))
             return 1
         else:
             return 0
@@ -332,13 +343,17 @@ class Trial:
         interestWindow_new = interestWindow - baseline  # Subtracting baseline from whole array
         return interestWindow_new, baseline
 
-    def _filter(self, filter='', cutoff=2000., order=4):
+    def _filter(self, filter='', cutoff=2000., order=4, trace=[]):
         ''' Filter the time series vector '''
+        if not len(trace):
+            trace = self.interestWindow
+
         if filter == 'bessel':
             cutoff_to_niquist_ratio = 2*cutoff/(self.F_sample) # F_sample/2 is Niquist, cutoff is the low pass cutoff.
             b, a = signal.bessel(order, cutoff_to_niquist_ratio, analog=False)
-            self.interestWindow = signal.filtfilt(b, a, self.interestWindow)
-
+            trace =  signal.filtfilt(b, a, trace)
+        return trace
+            
     def _smoothen(self, smootheningTime):
         '''normalizes the vector to an average baseline'''
         smootheningWindow = smootheningTime*1e-3*self.F_sample

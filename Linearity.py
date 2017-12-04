@@ -16,7 +16,7 @@ class Neuron:
         self.experiment = {}
         self.features = {0: 'epsp_max', 1: 'epsp_area', 2: 'epsp_avg',
                             3: 'epsp_time_to_peak', 4: 'epsp_area_to_peak',
-                            5: 'epsp_min', 6: 'epsp_onset'}
+                            5: 'epsp_min', 6: 'epsp_onset', 7:'positive_area',8: 'positive_time'}
         self.flagsList = ["AP_flag", "noise_flag", "baseline_flag",
                           "photodiode_flag"]
         self.save_trial = save_trial
@@ -255,6 +255,10 @@ class Trial:
             return self._findMinimum()
         elif feature == 6:
             return self._findOnsetTime(self.F_sample)
+        elif feature == 7:
+            return self._findPositiveArea()[0]
+        elif feature == 8:
+            return self._findPositiveArea()[1]
 
     # Features
     def _findMaximum(self):
@@ -304,6 +308,14 @@ class Trial:
                 # print index_left, pVal, stat#, self.interestWindow_raw[index_left:index_right]
                 break
         return float(index_left)/samplingFreq
+
+    def _findPositiveArea(self, binSize=10):
+        '''Finds the area under the curve of the vector in the given window'''
+        undersampling = self.interestWindow[::binSize]
+        undersampling = undersampling[np.where(undersampling>0.)]
+        auc_pos = np.trapz(undersampling,  dx=self.samplingTime*binSize)  # in V.s
+        positiveTime = self.samplingTime*len(undersampling)
+        return auc_pos, positiveTime 
 
     # Flags
     def _flagActionPotentials(self, AP_threshold=30):

@@ -3,6 +3,7 @@ import sys
 import Linearity 
 import os
 from util import getInputSizeOfPhotoActiveGrid, readBoxCSV, readMatlabFile, parseDictKeys, find_BaseLine_and_WindowOfInterest_Margins
+import matplotlib
 import matplotlib.pyplot as plt
 plt.style.use('neuron')
 from analysisVariables import *
@@ -11,9 +12,13 @@ import numpy as np
 import random
 import Tkinter, tkMessageBox, tkFileDialog
 import itertools
+from matplotlib.colors import LinearSegmentedColormap
 
 np.random.seed = randSeed 
 random.seed = randSeed 
+
+#global maxCoords 
+#maxCoords= 5
 
 def simpleaxis(axes, every=False, outward=False):
     if not isinstance(axes, (list, np.ndarray)):
@@ -226,6 +231,158 @@ def sampleCoordinates(oneSquareDictionary, number, square = 1, mode='uniform', t
         print "Initial length of coordinates ", len(coord_list_pre)
         return coord_list_pre[-number:]
 
+def generateCombinations(coordList, outDirectory):
+    b = [p for p in itertools.product(coordList, repeat=2)]
+    np.random.shuffle(b)
+    print (b)
+    
+    xarr, yarr = [], []
+    
+    for j in b:
+         x,y = zip(*j)
+         xarr+=x
+         yarr+=y
+    
+    with open(os.path.join(outDirectory , "coords", "CPA_randX.txt"),'w') as coordFile:
+        coordFile.write(','.join( [str(i+1) for i in xarr] )) # +1 for the coordinate shifti from 1 instead of 0
+    
+    with open(os.path.join(outDirectory , "coords", "CPA_randY.txt"),'w') as coordFile:
+        coordFile.write(','.join( [str(i+1) for i in yarr] )) # +1 for the coordinate shifti from 1 instead of 0
+
+def plotGrid(neuron, maxCoords, pickedCoords=[], experimentDir='./'):
+    AP_dict = np.zeros((13,13))
+    SubThP_dict = np.zeros((13,13))
+    for expType, exp in neuron:
+        if expType == "Control":
+            for coord in exp[1].coordwise:
+                temp_coord = []
+                temp_value = []
+                for trial in exp[1].coordwise[coord].trials:
+                    temp_coord.append(trial.AP_flag)
+                    if not trial.AP_flag:
+                        temp_value.append(trial.feature[0])
+                SubThP_dict[list(coord)[0]] = np.nanmean(temp_value)        
+                AP_dict[list(coord)[0]] = np.nansum(temp_coord)
+    SubThP_dict = np.ma.masked_where(SubThP_dict == 0., SubThP_dict)
+    print(SubThP_dict)
+
+    vmax = np.nanmax(SubThP_dict)
+    vmin = np.nanmin(SubThP_dict)
+    cmap = LinearSegmentedColormap.from_list('CA3_reds', [(0., 'white'), (1., (170/256., 0, 0))])
+    cmap.set_bad(color='white')
+
+    fig, ax = plt.subplots()
+    heatmap = ax.pcolormesh(SubThP_dict, cmap=cmap, vmin=vmin, vmax=vmax,picker=True)
+
+    #kjdef onclick(event):
+    #kj    x = int(np.round(event.xdata))
+    #kj    y = int(np.round(event.ydata))
+    #kj    tx = "Y: {}, X: {}, Value: {:.2f}".format(myylabels[y], myxlabels[x], X[y,x])
+    #kj    print(tx)
+
+    def onclick(event):
+        #if not len(event.ind):
+        #    return True
+        #ind = event.ind[0]
+        #
+        #ypos=event.ind[0] / 13
+        #xpos=event.ind[0] % 13
+        global pickedCoords
+        xpos, ypos = int(np.floor(event.xdata)), int(np.floor(event.ydata))
+        print(xpos, ypos)
+        circle1 = plt.Circle((xpos+0.5, ypos+0.5), 0.75, color='r', fill=False)
+        ax.add_artist(circle1)
+        fig.canvas.draw()
+        pickedCoords.append((xpos, ypos))
+
+        if len(pickedCoords) == maxCoords:
+            fig.canvas.mpl_disconnect(cid)
+            plt.close(fig)
+            print(pickedCoords)
+            generateCombinations(pickedCoords, experimentDir)
+        return
+
+        #print("Y: "+str(self.myylabels[self.ypos])+'  X:'+str(self.myxlabels[self.xpos]))
+
+    # mark a specific square?
+    zeros = np.zeros((13,13))
+    stim_coords = np.where(SubThP_dict>0)
+    zeros[stim_coords] = 1.
+    stim_coords = np.where(AP_dict>0)
+    zeros[stim_coords] = 1.
+
+    c = np.ma.masked_array(zeros, zeros == 0.)  # mask squares where value == 1
+    ax.pcolormesh(np.arange(14), np.arange(14), c, alpha=0.5, zorder=2, facecolor='none', edgecolors='k',
+                   cmap='gray', linewidth=1.)
+
+    for y in range(AP_dict.shape[0]):
+        for x in range(AP_dict.shape[1]):
+            if AP_dict[y, x] > 0:
+                plt.text(x + 0.5, y + 0.5, "{}".format(int(AP_dict[y, x])),
+                         horizontalalignment='center',
+                         verticalalignment='center', size=10)
+
+    ax.invert_yaxis()
+    for axis in [ax.xaxis, ax.yaxis]:
+        axis.set_ticks(np.arange(1,14), minor=True)
+        axis.set(ticks=np.arange(0,14,2)+0.5, ticklabels=np.arange(0,14,2)) #Skipping square labels
+
+    ax.grid(True, which='minor', axis='both', linestyle='--', alpha=0.1, color='k')
+    ax.set_xlim((0,13))
+    ax.set_ylim((0,13))
+
+    #Colorbar stuff
+    cbar = plt.colorbar(heatmap, label="Average response (mV)")
+    cbar.ax.get_yaxis().labelpad = 6
+    tick_locator = matplotlib.ticker.MaxNLocator(nbins=5)
+    cbar.locator = tick_locator
+    cbar.update_ticks()
+
+    ax.set_aspect(1)
+    fig.set_figheight(8.)
+    fig.set_figwidth(8.5)
+    simpleaxis(ax,every=True,outward=False)
+    cid = fig.canvas.mpl_connect('button_press_event', onclick)
+    # dump(fig,file('figures/fig1/1b.pkl','wb'))
+    fig.show()
+    
+    return list(set(pickedCoords))
+
+def chooseCoordinatesFromOneSquareData(inputDir,maxCoords):
+    inputDir = os.path.abspath(inputDir)
+    index, date = inputDir.split(os.sep)[::-1][:2]
+    
+    neuron = Linearity.Neuron(index, date)
+    print neuron.index, neuron.date 
+    type = 'Control'
+    experimentDir = os.path.join(inputDir , 'CPP')
+    
+    randX = os.path.join(experimentDir , 'coords', 'CPP_randX.txt')
+    randY = os.path.join(experimentDir , 'coords', 'CPP_randY.txt')
+    
+    coords = readBoxCSV(randX,randY)
+    repeatSize = len(coords[0])
+    
+    randX = os.path.join(experimentDir , 'coords', 'randX.txt')
+    randY = os.path.join(experimentDir , 'coords', 'randY.txt')
+    
+    CPP = os.path.join(experimentDir , 'CPP.mat')
+    
+    numSquares = 1
+    assert len(coords[0]) == len(coords[1]), "{},{}".format(len(coords[0]), len(coords[1]))
+    coords = [(i,j) for i,j in zip(coords[0], coords[1])]
+    
+    fullDict = readMatlabFile(CPP)
+    voltageTrace, photoDiode = parseDictKeys(fullDict)
+    marginOfBaseLine, marginOfInterest = find_BaseLine_and_WindowOfInterest_Margins(photoDiode,threshold, baselineWindowWidth, interestWindowWidth)
+    neuron.analyzeExperiment(type, numSquares, voltageTrace, photoDiode, coords, marginOfBaseLine, marginOfInterest,F_sample, smootheningTime )
+    
+    coordwise = neuron.experiment[type][1].coordwise
+
+    global pickedCoords
+    pickedCoords = [] 
+    pickedCoords = plotGrid(neuron, maxCoords,pickedCoords = pickedCoords, experimentDir=experimentDir)
+
 def createCoordinatesFromOneSquareData(inputDir, plotResponse=False):
     inputDir = os.path.abspath(inputDir)
     index, date = inputDir.split(os.sep)[::-1][:2]
@@ -309,9 +466,10 @@ def createCoordinatesFromOneSquareData(inputDir, plotResponse=False):
 class App():
     def __init__(self):
         self.root = Tkinter.Tk()
-        self.root.geometry("500x200")
+        self.root.geometry("500x300")
         self.root.wm_title("Coordinate Generator")
         self.plotResponse = 0
+        self.maxCoords = 0
 
         labelframe = Tkinter.LabelFrame(self.root, text="Generate new coordinates ")
         labelframe.pack(fill="both", expand="yes")
@@ -322,12 +480,31 @@ class App():
         labelframe_2.pack(fill="both", expand="yes")
         C1 = Tkinter.Checkbutton(labelframe_2, text = "Plot Response", variable = self.plotResponse, onvalue = 1, offvalue = 0, height=5, width = 20)
         right = Tkinter.Button(labelframe_2, text = 'Give location of cell', command=self.generateRandXFromData)
+        #right = Tkinter.Button(labelframe_2, text = 'Give location of cell', command=self.generateRandXFromDataByPickingSquares)
         C1.pack()
         right.pack()
+
+        labelframe_3 = Tkinter.LabelFrame(self.root, text="Create randX by choosing grid ")
+        labelframe_3.pack(fill="both", expand="yes")
+
+        self.scale = Tkinter.Scale(labelframe_3, orient='horizontal',from_=1,to=30,tickinterval=29, command=self.setMaxCoords)
+        #AnswerBox = Tkinter.Entry(labelframe_3)
+        #self.maxCoords = int(AnswerBox.get())
+        
+        #C1 = Tkinter.Checkbutton(labelframe_3, text = "Plot Response", variable = self.maxCoords, onvalue = 1, offvalue = 0, height=5, width = 20)
+        #right = Tkinter.Button(labelframe_2, text = 'Give location of cell', command=self.generateRandXFromData)
+        right2 = Tkinter.Button(labelframe_3, text = 'Give location of cell', command=self.generateRandXFromDataByPickingSquares)
+
+        #AnswerBox.pack()
+        self.scale.pack()
+        right2.pack()
 
         button = Tkinter.Button(self.root, text = 'Close', command=self.quit)
         button.pack()
         self.root.mainloop()
+
+    def setMaxCoords(self, value):
+        self.maxCoords = int(value)
 
     def quit(self):
         self.root.destroy() 
@@ -349,6 +526,15 @@ class App():
             return
         else:
             createCoordinatesFromOneSquareData(dir, plotResponse=self.plotResponse)
+
+    def generateRandXFromDataByPickingSquares(self):
+        dir = self.get_dir()
+        if not dir:
+            return
+        else:
+            print("coordinate", self.maxCoords)
+            chooseCoordinatesFromOneSquareData(dir, maxCoords=self.maxCoords)
+
 
 numEdgeSquares = 13
 circleDiameter = 10

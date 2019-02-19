@@ -66,7 +66,7 @@ class Experiment:
     ''' Change this to key: [coords, photodiode, value]'''
     def __init__(self, neuron, exptype, numSquares, voltage, photodiode, coords,
                  marginOfBaseline, marginOfInterest,
-                 F_sample, smootheningTime):
+                 F_sample, smootheningTime,repeatCoords=False):
         self.neuron = neuron
         self.type = exptype
         self.numSquares = numSquares
@@ -75,14 +75,14 @@ class Experiment:
         self.smootheningTime = smootheningTime
         self.marginOfBaseline = marginOfBaseline
         self.marginOfInterest = marginOfInterest
-        self.coords = self._returnCoordinates(coords, voltage)
+        self.coords = self._returnCoordinates(coords, voltage,repeatCoords)
         self.coordwise = {}
         self.regression_coefficients = {}
-        self.trial = {index: Trial(self, index, self.coords[index],
+        self.trial = ordered({index: Trial(self, index, self.coords[index],
                       photodiode[index].T[1], voltage[index].T[1])
-                      for index in voltage}
+                      for index in voltage})
 
-    def _returnCoordinates(self, coords, voltage):
+    def _returnCoordinates(self, coords, voltage,repeatCoords='False'):
         ''' Setup the coordinates for the trial '''
         keyrange = sorted(voltage.keys())
         assert keyrange == range(1, keyrange[-1]+1)  # Check missing trials
@@ -93,11 +93,13 @@ class Experiment:
             tempCoord = []
             for i in range(self.numSquares):
                 tempCoord.append(xy.next())
-
-            coords_for_square[key] = frozenset(tempCoord)
-            if len(coords_for_square[key]) != self.numSquares:
-                warnings.warn("Duplicate coordinate {} in combination {}!"
-                              .format(tempCoord, coords_for_square[key]))
+            if repeatCoords:
+                coords_for_square[key] = tuple(tempCoord)
+            else:
+                coords_for_square[key] = frozenset(tempCoord)
+                if len(coords_for_square[key]) != self.numSquares:
+                    warnings.warn("Duplicate coordinate {} in combination {}!"
+                                  .format(tempCoord, coords_for_square[key]))
         return coords_for_square
 
     def _transformTrials(self):

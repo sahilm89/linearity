@@ -82,7 +82,7 @@ for type in ['Control', 'GABAzine']:
         marginOfBaseLine, marginOfInterest = find_BaseLine_and_WindowOfInterest_Margins(photoDiode, aV.threshold,
                 aV.baselineWindowWidth, aV.interestWindowWidth)
         print (inputDir.split('/')[-1])
-        if any(x in inputDir.split('/')[-1] for x in ['CS', 'spikes', 'CA3_CPP']):
+        if any(x in inputDir.split('/')[-1] for x in ['CS', 'spikes', 'CA3_CPP', 'sine']):
 	    print ("Not removing APs for these cells")
             neuron.analyzeExperiment(type, numSquares, voltageTrace, photoDiode, coords, marginOfBaseLine, marginOfInterest,
                                  aV.F_sample, aV.smootheningTime, removeAP=False)

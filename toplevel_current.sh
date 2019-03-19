@@ -8,5 +8,5 @@ DATA_PATH=/media/sahil/NCBS_Shares_BGStim/patch_data/voltage_clamp_files.txt
 
 while read DATA
     do
-            python analyzeCurrentData.py $DATA
+        python analyzeCurrentData.py $DATA
     done <$DATA_PATH

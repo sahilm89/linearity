@@ -17,6 +17,8 @@ import rdesigneur as rd
 import sys
 sys.path.append('../')
 from Linearity import Neuron
+import shelve
+import pickle
 
 lines = []
 tplot = ""
@@ -49,9 +51,12 @@ inputDuration = 0.01
 printOutput = True
 makeMovie = True
 frameNum = 0
-fname = "movie/randomInput/frame"
+fname = "movie/rejected frames/frame"
 ttext = ""
 maxVolt = 20.
+minTime = 10.
+maxTime = 50.
+maxConductance = 0.4 
 
 exc_vec = np.zeros(int(runtime/elecDt)) 
 inh_vec = np.zeros(int(runtime/elecDt))
@@ -62,6 +67,7 @@ K_A_distrib = [['K_A', 'soma', 'Gbar', str(K_A_Gbar) ]]
 rec = []
 sdn_x = []
 sdn_y = []
+sdn_y2 = []
 last_pk = [0., 0.]
 gabaonset_list = []
 gluGbar_list = []
@@ -142,8 +148,10 @@ def get_EI_pairs(n):
     amplitude = {}
     sqrs = []
     coord_sqrs = {}
+    global EI_pair, EI_onset
 
     EI_pair = {}
+    EI_onset = {}
     E, I = {}, {}
     E_onsetDelay, I_onsetDelay = {}, {}
     for expType,expt in n:
@@ -152,16 +160,17 @@ def get_EI_pairs(n):
                 if (expType == 1):
                     sqrs.append(sqr)
                     for coord in expt[sqr].coordwise:
-
                         E[coord] = [] 
                         E_onsetDelay[coord] = []
-
                         delays = []
                         for trial in expt[sqr].coordwise[coord].trials:
                             E[coord].append(trial.interestWindow)
                             onset = findOnsetTime(trial, expType)
                             if onset:
                                 E_onsetDelay[coord].append(onset)
+                            else:
+                                E_onsetDelay[coord].append(np.nan)
+
                         #obs_exc[coord] = np.average(trajectory,axis=0)*nanosiemens/-70
                         #del_exc[coord] = np.nanmean(delays)
                         #t_arr = np.linspace(0,100,len(obs_exc[coord]))
@@ -169,7 +178,6 @@ def get_EI_pairs(n):
 
                 elif (expType == 2):
                     for coord in expt[sqr].coordwise:
-
                         I[coord] = [] 
                         I_onsetDelay[coord] = []
                         delays = []
@@ -178,14 +186,20 @@ def get_EI_pairs(n):
                             onset = findOnsetTime(trial, expType)
                             if onset:
                                 I_onsetDelay[coord].append(onset)
+                            else:
+                                I_onsetDelay[coord].append(np.nan)
+
                         #obs_inh[coord] = np.average(trajectory,axis=0)*nanosiemens/70
                         #del_inh[coord] = np.nanmean(delays)
                         #t_arr = np.linspace(0,100,len(obs_inh[coord]))
                         #ttp_inh[coord] = t_arr[np.argmax(obs_inh[coord])]
 
+    print("EI_onset\n\n\n\n\n\n\n\n\n\n\n")
     for coord in set(E.keys()).intersection(set(I.keys())):
         EI_pair[coord] = zipper(E[coord], I[coord])
         EI_onset[coord] = zipper(E_onsetDelay[coord],I_onsetDelay[coord])
+        print("EI_onset", EI_onset[coord])
+        print("EI_onset\n\n\n\n\n\n\n\n\n\n\n")
     return EI_pair, EI_onset
 
 def zipper (list1, list2):
@@ -203,6 +217,7 @@ class fileDialog():
         self.ax = ax
 
     def click( self, event ):
+        global sdn_x, sdn_y, sdn_y2, IE_ratio_arr, EI_pair, EI_onset
         dirname = get_dir()
         cellIndex = dirname.split('/')[-1]
         filename = dirname + '/plots/' + cellIndex + '.pkl'
@@ -214,6 +229,8 @@ class fileDialog():
             for j, synTuple in enumerate(EI_pair[coord]):
                 set_EmpSynVec(synTuple)
                 set_EmpOnset(EI_onset[coord][j])
+        with open('sdn_{}_{}_nospikes.pkl'.format(n.date, n.index), 'w') as f:  # Python 3: open(..., 'wb')
+            pickle.dump([sdn_x, sdn_y, sdn_y2, IE_ratio_arr, EI_pair, EI_onset], f)
 
 def set_EmpSynVec(synTuple):
     global exc_vec, inh_vec
@@ -224,7 +241,6 @@ def set_EmpOnset(EI_onset):
     global gluOnset, gabaOnset 
     gluOnset, gabaOnset = EI_onset 
     updateDisplay()
-
 
 def setGluGbar( val ):
     global gluGbar
@@ -300,7 +316,7 @@ def makeModel():
         verbose = False,
         chanProto = [
             #['make_glu()', 'glu'],['make_GABA()', 'GABA'],
-            #['make_K_A()','K_A'],
+            ['make_K_A()','K_A'],
             ['make_Na()', 'Na'],['make_K_DR()', 'K_DR'],
             ['make_EmpExc()', 'exc'], ['make_EmpInh()', 'inh']
         ],
@@ -335,7 +351,7 @@ def makeModel():
     moose.connect(tab_exc, 'requestOut', exc, 'getGk')
     moose.connect(tab_inh, 'requestOut', inh, 'getGk')
 
-    moose.le('/model/graphs')
+    #moose.le('/model/graphs')
 
 def makeModelWithoutInhibition():
     cd = [
@@ -353,7 +369,7 @@ def makeModelWithoutInhibition():
         verbose = False,
         chanProto = [
             #['make_glu()', 'glu'],['make_GABA()', 'GABA'],
-            #['make_K_A()','K_A'],
+            ['make_K_A()','K_A'],
             ['make_Na()', 'Na'],['make_K_DR()', 'K_DR'],
             ['make_EmpExc()', 'exc'], ['make_EmpInh()', 'inh']
         ],
@@ -389,9 +405,19 @@ def makeModelWithoutInhibition():
     moose.connect(tab_inh, 'requestOut', inh, 'getGk')
 
 def main():
-    warnings.filterwarnings("ignore", category=UserWarning, module="matplotlib")
+    #filename = 'sdn_vars.shv'
+    #my_shelf = shelve.open(filename, 'n')
 
+    warnings.filterwarnings("ignore", category=UserWarning, module="matplotlib")
     makeDisplay()
+
+    #for key in dir():
+    #    try:
+    #        my_shelf[key] = globals()[key]
+    #    except TypeError:
+    #        print("Error shelving: }0}".format(key))
+    #my_shelf.close()
+
     quit()
 
 class stimToggle():
@@ -402,9 +428,17 @@ class stimToggle():
 
     def click( self, event ):
         global spikingDistrib
+        global stimObj
+        global ax2
+        global maxVolt
+        print("Stim Obj toggle", stimObj.duration)
         if self.duration < 0.5:
             self.duration = 1.0
             self.toggle.label.set_text( "Spiking off" )
+            ax2.set_xlabel("Expected $V_m$ (mV)")
+            ax2.set_ylabel("Observed $V_m$ (mV)")
+            ax2.set_xlim( 0, maxVolt )
+            ax2.set_ylim( 0, maxVolt )
             self.toggle.color = "yellow"
             self.toggle.hovercolor = "yellow"
             spikingDistrib = []
@@ -413,6 +447,12 @@ class stimToggle():
             self.toggle.label.set_text( "Spiking on" )
             self.toggle.color = "orange"
             self.toggle.hovercolor = "orange"
+            cmap = plt.get_cmap('plasma')
+            ax2.set_xlabel("Max. Conductance (nS)")
+            ax2.set_ylabel("Spike Time (ms)")
+            ax2.set_xlim( 0, maxConductance )
+            ax2.set_ylim( minTime, maxTime )
+
             spikingDistrib = [['Na', 'soma', 'Gbar', '200' ],['K_DR', 'soma', 'Gbar', '250' ]]
         updateDisplay()
 
@@ -491,6 +531,8 @@ def updateDisplay():
     global frameNum
     global sdn_x
     global sdn_y
+    global sdn_y2
+    global sdn_plot_exc
     global IE_ratio_arr
     global last_pk
     global gabaonset_list
@@ -501,41 +543,53 @@ def updateDisplay():
     global e_g_peak
     global exc_vec
     global inh_vec
+    global stimObj
 
     #print (K_A_Gbar)
     makeModel()
     moose.reinit()
     moose.start( runtime )
     tabvec = moose.element( '/model/graphs/plot0' ).vector
-    moose.le('/model/graphs/')
-    tabvec_filtered = tabvec[int(gluOnset/elecPlotDt):]
-    #print "############## len tabvec = ", len(tabvec)
-    print(int(gluOnset/elecPlotDt))
-    maxval = max(tabvec_filtered)
-    print(maxval)
-    imaxval = int(gluOnset/elecPlotDt) + list(tabvec_filtered).index( maxval )
-    maxt = imaxval * elecPlotDt * 1000
-    pk = (maxval - min( tabvec[:imaxval+1] )) * 1000
-    ttext.set_text( "Peak amp.= {:.1f} mV \nPeak time = {:.1f} ms".format( pk, maxt  ) )
+    #moose.le('/model/graphs/')
+    gluOnsetIndex = gluOnset/elecPlotDt
+    spikeTime = np.inf # Initializaing to infinity
+    spikeTime_exc = np.inf # Initializaing to infinity
+    if not np.isnan(gluOnsetIndex): 
+        tabvec_filtered = tabvec[int(gluOnset/elecPlotDt):]
+        #print "############## len tabvec = ", len(tabvec)
+        #print((gluOnset/elecPlotDt))
+        maxval = max(tabvec_filtered)
+        #print(maxval)
+        imaxval = int(gluOnset/elecPlotDt) + list(tabvec_filtered).index( maxval )
+        maxt = imaxval * elecPlotDt * 1000
+        pk = (maxval - min( tabvec[:imaxval+1] )) * 1000
+        ttext.set_text( "Peak amp.= {:.1f} mV \nPeak time = {:.1f} ms".format( pk, maxt  ) )
+        spikeTime = (int(gluOnset/elecPlotDt) + findFirstSpikeTime(tabvec_filtered))*elecPlotDt*1e3
+        if stimObj.duration <0.5:
+            last_pk[1] = spikeTime
+        else:
+            last_pk[1] = pk 
     tplot.set_ydata( tabvec * 1000 )
+
+    exc_g = moose.element( '/model/graphs/plot1' ).vector
+    inh_g = moose.element( '/model/graphs/plot2' ).vector
+    IE_ratio = max(inh_g)/max(exc_g)
 
     norm = matplotlib.colors.Normalize(vmin=0.,vmax=7)
     tplot.set_color(plt.cm.plasma(norm(IE_ratio)))
-    last_pk[1] = pk 
     
     #exc_i = moose.element( '/model/graphs/plot1' ).vector
     #inh_i = moose.element( '/model/graphs/plot2' ).vector
     #e_plot.set_ydata(exc_i*1e12)
     #i_plot.set_ydata(inh_i*1e12)
 
-    exc_g = moose.element( '/model/graphs/plot1' ).vector
-    inh_g = moose.element( '/model/graphs/plot2' ).vector
     e_g_plot.set_ydata(exc_g*1e9)
     i_g_plot.set_ydata(inh_g*1e9)
 
-    print("Sent in/recovered = {}".format(np.array(exc_vec)/np.array(exc_g[1:])))
 
-    print(gabaonset_list, max_g_exc)
+    #print("Sent in/recovered = {}".format(np.array(exc_vec)/np.array(exc_g[1:])))
+
+    #print(gabaonset_list, max_g_exc)
     del_exc_scat.set_xdata(gabaonset_list)
     del_exc_scat.set_ydata(max_g_exc)
     #del_exc_scat.set_array(np.array(IE_ratio_arr))
@@ -550,8 +604,8 @@ def updateDisplay():
     ion_text.set_x(gabaOnset*1e3 + 3)
     ep_text.set_y(max(exc_g*1e9) + 0.05)
 
-    if printOutput:
-        print( "{:.2f}\t{:.2f}\t{:.2f}\t{:.2f}\t{:.2f}\t{:.2f}\t{:.2f}\t{:.2f}\t{:.2f}".format( maxval*1000, pk,maxt, gluGbar, gabaGbar, K_A_Gbar, gabaOnset*1000, RM, CM ) )
+    #if printOutput:
+    #    print( "{:.2f}\t{:.2f}\t{:.2f}\t{:.2f}\t{:.2f}\t{:.2f}\t{:.2f}\t{:.2f}\t{:.2f}".format( maxval*1000, pk,maxt, gluGbar, gabaGbar, K_A_Gbar, gabaOnset*1000, RM, CM ) )
    
     moose.delete( '/model' )
     moose.delete( '/library' )
@@ -567,22 +621,30 @@ def updateDisplay():
     pk = (maxval - min( tabvec[:imaxval+1] )) * 1000
     tplot_noinh.set_ydata( tabvec * 1000 )
 
+    spikeTime_exc = findFirstSpikeTime(tabvec)*elecPlotDt*1e3
+    
     last_pk[0] = pk 
     
     moose.delete( '/model' )
     moose.delete( '/library' )
 
     last_point.set_data(last_pk)
-    last_point.set_data(last_pk)
     sdn_plot.set_offsets(np.array(zip(sdn_x, sdn_y)))
     sdn_plot.set_array(np.array(IE_ratio_arr))
-    print("DIMS are", np.shape(np.array(zip(sdn_x, sdn_y))))
+    #print("DIMS are", np.shape(np.array(zip(sdn_x, sdn_y))))
     #sdn_plot.set_xdata(sdn_x)
     #sdn_plot.set_ydata(sdn_y)
     #sdn_plot.set_color(IE_ratio_arr)
+    if stimObj.duration <0.5:
+        #print(type(sdn_plot_exc))
+        sdn_plot_exc.set_offsets(np.array(zip(sdn_x, sdn_y)))
+        sdn_x.append(max_g_exc[-1])
+        sdn_y.append(spikeTime)
+        sdn_y2.append(spikeTime_exc)
+    else:
+        sdn_x.append(last_pk[0])
+        sdn_y.append(last_pk[1])
 
-    sdn_x.append(last_pk[0])
-    sdn_y.append(last_pk[1])
     IE_ratio_arr.append(IE_ratio)
  
     #dynDel_plot.set_xdata(gluGbar_list)
@@ -602,7 +664,7 @@ def updateDisplay():
 
     gluGbar_list.append(gluGbar)
     
-    print(frameNum)
+    #print(frameNum)
     if makeMovie:
         plt.savefig( "{}_{:04d}.png".format(fname, frameNum) )
         frameNum += 1
@@ -610,11 +672,15 @@ def updateDisplay():
 def doQuit( event ):
     quit()
 
+def findFirstSpikeTime(trace, threshold=-0.050):
+    return np.min(np.append(np.where(trace>threshold)[0],np.inf))
+
 def makeDisplay():
     global lines
     global tplot
     global tplot_noinh
     global sdn_plot
+    global sdn_plot_exc
     global last_point
     global dynDel_plot
     global dynDel_last_point
@@ -636,6 +702,7 @@ def makeDisplay():
     global del_exc_scat
     global ep_text
     global ion_text
+    global stimObj
 
     #img = mpimg.imread( 'EI_input.png' )
     img = mpimg.imread( 'Image_simulation_3.png' )
@@ -651,6 +718,60 @@ def makeDisplay():
     png = plt.subplot2grid((3,2), (0,0), colspan=1, rowspan=1)
     imgplot = plt.imshow( img )
     plt.axis('off')
+
+    ax = plt.subplot2grid((3,3), (2,0), colspan=1, rowspan=1)
+    plt.axis('off')
+    axcolor = 'palegreen'
+    axStim = plt.axes( [0.02,0.005, 0.20,0.04], facecolor='green' )
+    #axKA = plt.axes( [0.14,0.005, 0.10,0.03], facecolor='green' )
+    axLoad = plt.axes( [0.24,0.005, 0.20,0.04], facecolor='green' )
+    axReset = plt.axes( [0.46,0.005, 0.20,0.04], facecolor='blue' )
+    axQuit = plt.axes( [0.68,0.005, 0.30,0.04], facecolor='blue' )
+
+    for x in np.arange( 0.11, 0.26, 0.06 ):
+        axes.append( plt.axes( [0.25, x, 0.65, 0.04], facecolor=axcolor ) )
+
+    sliders.append( Slider( axes[2], "gluGbar (Mho/m^2)", 0.001, max_exc_cond, valinit = gluGbar))
+
+    sliders[-1].on_changed( setGluGbar )
+    sliders.append( Slider( axes[0], "I/E ratio", 0.001, 6., valinit = IE_ratio) )
+    sliders[-1].on_changed( setIE_ratio )
+    #sliders[-1].on_changed( setK_A_Gbar )
+
+    #sliders.append( Slider( axes[0], "K_A_Gbar (Mho/m^2)", 1, 100, valinit = 0) )
+    #sliders[-1].on_changed( setK_A_Gbar )
+    #ka_slider_index = len(sliders)-1
+
+    sliders.append( Slider( axes[1], "Dynamic Inh. Delay", 1, 20.0, valinit = dynamicDelay, valfmt='%0.2f'))
+    sliders[-1].on_changed( setDynamicDelay )
+    dynDel_slider_index = len(sliders)-1
+
+    #for j in sliders:
+    #    j.label.set_fontsize(8)
+    stim = Button( axStim, 'Spiking off', color = 'yellow' )
+    stim.label.set_fontsize(10)
+    stimObj = stimToggle( stim, axStim )
+    
+    #ka_current = Button( axKA, 'KA off', color = 'yellow' )
+    #ka_current_obj= kaToggle( ka_current, axKA, ka_slider_index )
+ 
+    load_button = Button( axLoad, 'Load File', color = 'yellow'  )
+    load_button.label.set_fontsize(10)
+    #load_obj= dynamicDelayToggle( load_button, axLoad, dynDel_slider_index)
+    load_obj= fileDialog(load_button) #load_button, axLoad, dynDel_slider_index)
+ 
+    reset = Button( axReset, 'Reset', color = 'cyan' )
+    reset.label.set_fontsize(10)
+    q = Button( axQuit, 'Quit', color = 'pink' )
+    q.label.set_fontsize(10)
+
+
+    #sliders.append( Slider( axes[3], "GABA Onset time (ms)", 10, 50, valinit = gabaOnset * 1000) )
+    #sliders[-1].on_changed( setGabaOnset )
+    #sliders.append( Slider( axes[4], "RM (Ohm.m^2)", 0.1, 10, valinit = RM))
+    #sliders[-1].on_changed( setRM )
+    #sliders.append( Slider( axes[5], "CM (Farads/m^2)", 0.001, 0.1, valinit = CM, valfmt='%0.3f'))
+    #sliders[-1].on_changed( setCM )
 
     t = np.arange( 0.0, runtime + elecPlotDt / 2.0, elecPlotDt ) * 1000 #ms
 
@@ -709,7 +830,8 @@ def makeDisplay():
     ax2.set_xlim( 0, maxVolt )
     ax2.set_ylim( 0, maxVolt )
     #sdn_plot, = ax2.plot(sdn_x, sdn_y, 'o', markersize=6, markerfacecolor=IE_ratio, cmap=cmap)
-    sdn_plot = ax2.scatter([], [], s=12, c=[], cmap=cmap, vmin=0., vmax=7.)
+    sdn_plot = ax2.scatter([], [], s=12, c=[], cmap=cmap, vmin=0., vmax=7., marker='o', facecolor=None)
+    sdn_plot_exc = ax2.scatter([], [], s=12, c=[], cmap=cmap, vmin=0., vmax=7., marker='v', facecolor=None)
     last_point, = ax2.plot(last_pk[0], last_pk[1], 'o', markersize=7, markerfacecolor='k')
     sdn_cbar = plt.colorbar(sdn_plot, ax=ax2, shrink=0.8)
     sdn_cbar.ax.set_title(" I/E")
@@ -739,59 +861,6 @@ def makeDisplay():
     #ax3_peaktime.spines['top'].set_visible(False)
 
     #ax = fig.add_subplot(313)
-    ax = plt.subplot2grid((3,3), (2,0), colspan=1, rowspan=1)
-    plt.axis('off')
-    axcolor = 'palegreen'
-    axStim = plt.axes( [0.02,0.005, 0.20,0.04], facecolor='green' )
-    #axKA = plt.axes( [0.14,0.005, 0.10,0.03], facecolor='green' )
-    axLoad = plt.axes( [0.24,0.005, 0.20,0.04], facecolor='green' )
-    axReset = plt.axes( [0.46,0.005, 0.20,0.04], facecolor='blue' )
-    axQuit = plt.axes( [0.68,0.005, 0.30,0.04], facecolor='blue' )
-
-    for x in np.arange( 0.11, 0.26, 0.06 ):
-        axes.append( plt.axes( [0.25, x, 0.65, 0.04], facecolor=axcolor ) )
-
-    sliders.append( Slider( axes[2], "gluGbar (Mho/m^2)", 0.001, max_exc_cond, valinit = gluGbar))
-
-    sliders[-1].on_changed( setGluGbar )
-    sliders.append( Slider( axes[0], "I/E ratio", 0.001, 6., valinit = IE_ratio) )
-    sliders[-1].on_changed( setIE_ratio )
-    #sliders[-1].on_changed( setK_A_Gbar )
-
-    #sliders.append( Slider( axes[0], "K_A_Gbar (Mho/m^2)", 1, 100, valinit = 0) )
-    #sliders[-1].on_changed( setK_A_Gbar )
-    #ka_slider_index = len(sliders)-1
-
-    sliders.append( Slider( axes[1], "Dynamic Inh. Delay", 1, 20.0, valinit = dynamicDelay, valfmt='%0.2f'))
-    sliders[-1].on_changed( setDynamicDelay )
-    dynDel_slider_index = len(sliders)-1
-
-    #for j in sliders:
-    #    j.label.set_fontsize(8)
-    stim = Button( axStim, 'Spiking off', color = 'yellow' )
-    stim.label.set_fontsize(10)
-    stimObj = stimToggle( stim, axStim )
-    
-    #ka_current = Button( axKA, 'KA off', color = 'yellow' )
-    #ka_current_obj= kaToggle( ka_current, axKA, ka_slider_index )
- 
-    load_button = Button( axLoad, 'Load File', color = 'yellow'  )
-    load_button.label.set_fontsize(10)
-    #load_obj= dynamicDelayToggle( load_button, axLoad, dynDel_slider_index)
-    load_obj= fileDialog(load_button) #load_button, axLoad, dynDel_slider_index)
- 
-    reset = Button( axReset, 'Reset', color = 'cyan' )
-    reset.label.set_fontsize(10)
-    q = Button( axQuit, 'Quit', color = 'pink' )
-    q.label.set_fontsize(10)
-
-
-    #sliders.append( Slider( axes[3], "GABA Onset time (ms)", 10, 50, valinit = gabaOnset * 1000) )
-    #sliders[-1].on_changed( setGabaOnset )
-    #sliders.append( Slider( axes[4], "RM (Ohm.m^2)", 0.1, 10, valinit = RM))
-    #sliders[-1].on_changed( setRM )
-    #sliders.append( Slider( axes[5], "CM (Farads/m^2)", 0.001, 0.1, valinit = CM, valfmt='%0.3f'))
-    #sliders[-1].on_changed( setCM )
     def resetParms( event ):
         for i in sliders:
             i.reset()
@@ -819,12 +888,12 @@ def makeDisplay():
     reset.on_clicked( resetParms )
     q.on_clicked( doQuit )
 
-    if printOutput:
-        print( "maxval\tpk\tmaxt\tgluG\tgabaG\tK_A_G\tgabaon\tRM\tCM" )
+    #if printOutput:
+    #    print( "maxval\tpk\tmaxt\tgluG\tgabaG\tK_A_G\tgabaon\tRM\tCM" )
     updateDisplay()
 
     plt.show()
 
 # Run the 'main' if this script is executed standalone.
 if __name__ == '__main__':
-        main()
+        main() 

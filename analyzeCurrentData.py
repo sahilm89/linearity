@@ -62,7 +62,7 @@ def analyzeExperiment(instance, type, squares, voltage, photodiode, coords,
 
     instance.experiment[type][squares]._groupTrialsByCoords()  # Coord grouping
 
-def setup(inputDir, index, date, save_trial=False):
+def setup(inputDir, index, date, save_trial=False, loopbackScalingFactor=1):
     neuron = Linearity.Neuron(index, date, save_trial)
     print neuron.index, neuron.date
     
@@ -78,7 +78,7 @@ def setup(inputDir, index, date, save_trial=False):
         randY = experimentDir + 'coords/CPP_randY.txt'
     
     coords = readBoxCSV(randX, randY)
-    repeatSize = len(coords[0])
+    repeatSize = len(coords[0])/loopbackScalingFactor
 
     randX = experimentDir + 'coords/randX.txt'
     randY = experimentDir + 'coords/randY.txt'
@@ -117,7 +117,7 @@ inputDir = os.path.abspath(sys.argv[1])
 index, date = inputDir.split('/')[::-1][:2]
 
 plotFile = inputDir + '/plots/' + index + '.pkl'
-neuron = setup(inputDir, index, date, save_trial=True)
+neuron = setup(inputDir, index, date, save_trial=True, loopbackScalingFactor=1) # Scaling factor for loopbackScalingFactor if the loopback was different than usual.
 neuron.save(plotFile)
 
 with open(plotFile, 'rb') as input:

@@ -26,7 +26,7 @@ runtime = 0.08
 elecPlotDt = 0.0002
 sliderMode = "Gbar"
 gluGbar = 0.001
-IE_ratio = 1.0
+IE_ratio = 1
 IE_ratio_arr = []
 dynamicDelay = 6.37 
 dynamicDelay_toggle = 1
@@ -41,9 +41,10 @@ max_exc_cond = 0.7
 inputFreq = 100.0
 inputDuration = 0.01
 printOutput = True
-makeMovie = True
+makeMovie = False
 frameNum = 0
-fname = "movie/frame"
+prefix = "movie_sdn_DI_1"
+fname = prefix + "/frame"
 ttext = ""
 maxVolt = 20.
 
@@ -161,6 +162,7 @@ def makeModel():
     moose.element( '/library/GABA' ).Ek = -0.07
     
     rdes.buildModel()
+    print(moose.showfields(rdes.soma))
     #moose.showfields( '/model/elec/soma/glu/sh')
     #moose.le( '/model/elec/soma/glu')
 
@@ -353,7 +355,10 @@ def updateDisplay():
     ep_text.set_y(max(exc_g*1e9) + 0.05)
 
     if printOutput:
+
+        print( "maxval\tpk\tmaxt\tgluG\tgabaG\tK_A_G\tgabaon\tRM\tCM" )
         print( "{:.2f}\t{:.2f}\t{:.2f}\t{:.2f}\t{:.2f}\t{:.2f}\t{:.2f}\t{:.2f}\t{:.2f}".format( maxval*1000, pk,maxt, gluGbar, gabaGbar, K_A_Gbar, gabaOnset*1000, RM, CM ) )
+        print(moose.showfields('/model/elec'))
    
     moose.delete( '/model' )
     moose.delete( '/library' )
@@ -406,7 +411,7 @@ def updateDisplay():
     
     print(frameNum)
     if makeMovie:
-        plt.savefig( "{}_{:04d}.png".format(fname, frameNum) )
+        plt.savefig( "{}_{:04d}.svg".format(fname, frameNum) )
         frameNum += 1
  
 def doQuit( event ):

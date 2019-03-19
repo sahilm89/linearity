@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.stats as ss
 
+190227/c2_sine/PPF
+190227/c2_sine/PPF_elec
+
 analysisFile = os.path.abspath(sys.argv[1])
 plotPath = os.path.dirname(analysisFile)
 with open(analysisFile, 'rb') as input:

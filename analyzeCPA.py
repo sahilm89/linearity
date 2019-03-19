@@ -123,7 +123,7 @@ def setup(inputDir, index, date, save_trial=False):
 inputDir = os.path.abspath(sys.argv[1])
 index, date = inputDir.split('/')[::-1][:2]
 
-plotFile = inputDir + '/plots/' + index + '.pkl'
+plotFile = inputDir + '/plots/' + index + '_cpa.pkl'
 neuron = setup(inputDir, index, date, save_trial=True)
 neuron.save(plotFile)
 
